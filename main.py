@@ -1,36 +1,40 @@
 import tkinter
-# This is a sample Python script.
-
+import InsideApp
+from PIL import ImageTk,Image
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
 window = tkinter.Tk()  # Zmena názvu Aplikace
-window.minsize(width=220, height=80)  # Nastavení velikosti okna aplikace
-window.title("Application")  # Pojmenování aplikace
+window.minsize(width=500, height=500)  # Nastavení velikosti okna aplikace
+window.title("Log In")  # Pojmenování aplikace
+
+
+
+
 
 def print_hi():
-
-
-
-    # label = tkinter.Label(window, text="Please log in").pack(side="top", anchor="nw") # Zobrazení zprávy uvnitř pack - nahoru dolu, anchor - uhlopřička
-
-    # label = tkinter.Label(window, text='Please log in', font="Arial").grid(row=0)
-
-    tkinter.Label(window, text="Username").grid(row=0)  # 'username' is placed on position 00 (row - 0 and column - 0)
-    # 'Entry' class is used to display the input-field for 'username' text label
-    tkinter.Entry(window).grid(row=0, column=1)  # first input-field is placed on position 01 (row - 0 and column - 1)
-
-    tkinter.Label(window, text="Password").grid(row=1)  # 'password' is placed on position 10 (row - 1 and column - 0)
-
-    tkinter.Entry(window, show="*").grid(row=1, column=1)  # second input-field is placed on position 11 (row - 1 and column - 1)
-    # tkinter.Button(window, text="Click Me!", command=DataCamp_Tutorial).grid()
-    tkinter.Button(window, text="Click To Log In!", command=Log_in).grid(row=2, column=1)
-
+    x, y = 1920, 1040
+    cavas = tkinter.Canvas(window, width=1920, height=1080)
+    cavas.pack(anchor="s")
+    login_button = tkinter.Button(window, text="Click To Log In!", anchor="center", command=Log_in)
+    cavas.create_window(x/2, y/2,  window=login_button)
+    image = ImageTk.PhotoImage(file="png-1.png")
+    cavas.create_image(960, 540, image=image)
+    Username = tkinter.Label(window, text="Username")
+    cavas.create_window(870, 460, window = Username)
+    EntryUser = tkinter.Entry(window)
+    cavas.create_window(970, 460,window=EntryUser)
+    Password = tkinter.Label(window, text="Password")
+    cavas.create_window(870, 485, window=Password)
+    PasswordEntry = tkinter.Entry(window, show="*")
+    cavas.create_window(970, 485, window=PasswordEntry)
     window.mainloop()  # spuštění
 
 def Log_in():
-    tkinter.Label(window, text="Logged in!").grid()
+    tkinter.Label(window, text="Logged in!").pack()
+    window.destroy()
+    InsideApp.InsideApp()
 
 
 
