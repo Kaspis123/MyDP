@@ -3,6 +3,7 @@ import Running
 import NewQ
 import Done
 import NewS
+import User_Manage
 
 def InsideApp(check):
     windowAPP = tkinter.Tk()  # vytvořeni objektu
@@ -16,10 +17,12 @@ def InsideApp(check):
 
     btn4 = tkinter.Button(windowAPP, text="New Scam", fg="orange",command=NewScript).pack(side="left",anchor="nw")
     if check == "admin":
-        btn5 = tkinter.Button(windowAPP, text="Settings", fg="black", command=NewScript).pack(side="left", anchor="nw")
+        btn5 = tkinter.Button(windowAPP, text="User Management", fg="black", command=User_Mana).pack(side="left", anchor="nw")
 
     windowAPP.mainloop()  # spuštění
 
+def User_Mana():
+    User_Manage.Managemet()
 
 def NewQuest():
     NewQ.NewQ()

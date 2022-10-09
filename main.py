@@ -26,6 +26,7 @@ def resize_widgets(event):
 
 def Log_in():
     Check = Database.get_data_from_database(EntryUser.get(), PasswordEntry.get())
+    # InsideApp.InsideApp()
     x = EntryUser.get()
     if Check == True:
         window.destroy()
