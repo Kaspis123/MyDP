@@ -25,14 +25,16 @@ def resize_widgets(event):
 
 
 def Log_in():
-    Check = Database.get_data_from_database(EntryUser.get(), PasswordEntry.get())
-    # InsideApp.InsideApp()
-    x = EntryUser.get()
-    if Check == True:
-        window.destroy()
-        InsideApp.InsideApp(x)
-    else:
-        messagebox.showerror("Error", "Wrong Username or Password")
+    # Check = Database.get_data_from_database(EntryUser.get(), PasswordEntry.get())
+    window.destroy()
+    InsideApp.InsideApp()
+
+    # x = EntryUser.get()
+    # if Check == True:
+    #     window.destroy()
+    #     InsideApp.InsideApp(x)
+    # else:
+    #     messagebox.showerror("Error", "Wrong Username or Password")
 
 cavas = tkinter.Canvas(window, width=1980, height=1080)
 cavas.pack(expand=True, fill='both')

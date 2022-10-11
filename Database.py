@@ -71,11 +71,18 @@ def Delete_User(Name):
     con = sq3.connect("users.db")
     cur = con.cursor()
     cur.execute("DELETE FROM Users WHERE Name = ?", [Name])
-    Show_All_Database()
     con.commit()
 
 def Show_All_Database():
     con = sq3.connect("users.db")
     cur = con.cursor()
     cur.execute("Select id,Name,Password  FROM Users")
-    print(cur.fetchall()[0])
+    print(cur.fetchall())
+
+def fetch( hostname=''):
+    con = sq3.connect("users.db")
+    cur = con.cursor()
+    cur.execute(
+            "SELECT * FROM Users WHERE Name LIKE ?", ('%'+hostname+'%',))
+    rows = cur.fetchall()
+    return rows
