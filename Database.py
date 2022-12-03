@@ -1,5 +1,7 @@
 
 import sqlite3 as sq3
+from tkinter import messagebox
+
 import User_Manage
 
 def create_database():
@@ -68,10 +70,13 @@ def Database_Check(Name):
         return True
 
 def Delete_User(Name):
-    con = sq3.connect("users.db")
-    cur = con.cursor()
-    cur.execute("DELETE FROM Users WHERE Name = ?", [Name])
-    con.commit()
+    if Database_Check(Name) == True:
+        messagebox.showerror("Error", "No such user exists")
+    else:
+        con = sq3.connect("users.db")
+        cur = con.cursor()
+        cur.execute("DELETE FROM Users WHERE Name = ?", [Name])
+        con.commit()
 
 def Show_All_Database():
     con = sq3.connect("users.db")

@@ -55,17 +55,17 @@ def Managemet():
     router_tree_view.config(yscrollcommand=scrollbar.set)
     frame_btns = Frame(window)
     frame_btns.grid(row=3, column=0)
-    btn1 = tkinter.Button(window, text="Add User", fg="Black", command=lambda: Add_User(hostname_entry.get(),Password_entry.get(),hostname_entry,Password_entry,router_tree_view))
-    btn1.grid(row=3, column=1, pady=20)
-    btn2 = tkinter.Button(window, text="Delete User", fg="Black", command=lambda: remove_User(hostname_entry.get(), hostname_entry,Password_entry,router_tree_view))
+    btn1 = tkinter.Button(window, text="Add User", fg="Black", command=lambda: Add_User(hostname_entry.get(), Password_entry.get(), hostname_entry, Password_entry, router_tree_view))
+    btn1.grid(row=3, column=2, pady=20)
+    btn2 = tkinter.Button(window, text="Delete User", fg="Black", command=lambda: remove_User(hostname_entry.get(), hostname_entry, Password_entry,router_tree_view))
     btn2.grid(row=3, column=1, pady=20)
-    search_btn = Button(frame_search, text='Search', width=12, command=lambda: search_hostname(router_tree_view,hostname_search_entry.get()))
+    search_btn = Button(frame_search, text='Search', width=12, command=lambda: search_hostname(router_tree_view, hostname_search_entry.get()))
     search_btn.grid(row=1, column=3, pady=20)
     populate_list(router_tree_view,)
 
 
 def Add_User(hostname, password, hostname_entry, password_entry, router):
-    if hostname == '' or password == '' :
+    if hostname == '' or password == '':
         messagebox.showerror('Required Fields', 'Please include all fields')
         return
     Database_Add(hostname, password)
@@ -74,9 +74,12 @@ def Add_User(hostname, password, hostname_entry, password_entry, router):
 
 
 def remove_User(Name, hostname_entry, password_entry, router):
-    Database.Delete_User(Name)
-    clear_text(hostname_entry, password_entry)
-    populate_list(router)
+    if Name == '':
+        messagebox.showerror("Error", "No user chosen")
+    else:
+        Database.Delete_User(Name)
+        clear_text(hostname_entry, password_entry)
+        populate_list(router)
 
 def Database_Add(User, Password):
     if len(User) < 3:
