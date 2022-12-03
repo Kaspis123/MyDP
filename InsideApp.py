@@ -1,4 +1,6 @@
 import tkinter
+
+import DatabaseForScripts
 import Running
 import NewQ
 import Done
@@ -6,6 +8,7 @@ import NewS
 import User_Manage
 
 def InsideApp():
+    DatabaseForScripts.start()
     windowAPP = tkinter.Tk()  # vytvořeni objektu
     windowAPP.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
     windowAPP.title("Application")  # Pojmenování aplikace
@@ -15,7 +18,7 @@ def InsideApp():
 
     btn3 = tkinter.Button(windowAPP, text="Finished", fg="black",command=Finished).pack(side="left",anchor="nw")  # 'side' is used to left or right align the widgets
 
-    btn4 = tkinter.Button(windowAPP, text="New Scam", fg="orange",command=NewScript).pack(side="left",anchor="nw")
+    btn4 = tkinter.Button(windowAPP, text="New Scam", fg="orange",command=lambda :[windowAPP.destroy(),NewScript()]).pack(side="left",anchor="nw")
     # if check == "admin":
     btn5 = tkinter.Button(windowAPP, text="User Management", fg="black", command=lambda :[windowAPP.destroy(),User_Mana()]).pack(side="left", anchor="nw")
 

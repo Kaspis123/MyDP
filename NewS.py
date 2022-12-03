@@ -1,71 +1,57 @@
-import tkinter
+import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import Canvas, messagebox
-
+from tkinter import *
+from tkinter.ttk import *
 from Tools.scripts.pindent import start
+import InsideApp
 
-x = 100
-y = 60
-
-
-
+x = 0
+def retrieve_input(T):
+    input = T.get("1.0", END)
+    print(input)
+    T.delete("1.0", END)
+    global x
+    x += 1
+    if (x % 2) == 1:
+        T.insert(INSERT, "Zadejte text při negativní odpovědi")
+    else:
+        T.insert(INSERT, "Zadejte text při pozitivní odpovědi")
 
 def NewS():
-    windowAPP = tkinter.Tk()  # vytvořeni objektu
-    windowAPP.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
-    windowAPP.title("New Script")  # Pojmenování aplikace
-
-
-    def onMove(event):
-
-
-        print(event.x)
-        C.move(Myrec, event.x, 0)
-
-
-    def Edit():
-        windowAPPEdditing = tkinter.Tk()
-        windowAPPEdditing.title("Editor")
-        text = tkinter.Text(windowAPPEdditing, height=8)
-        text.pack()
-        text['state'] = 'normal'
-        text_content = text.get('1.0', 'end')
-        btnSave = tkinter.Button(windowAPPEdditing, text="Save & Quit", fg="black", command=Negative).pack(anchor="center")
-
-    def Positive():
-        P = Canvas(windowAPP,  height=50, width=100)
-        Myrec = C.create_rectangle(x, y, 0, 0, fill="Green", tags="playbutton")
-        windowAPP.bind('<Button 1 >', onMove)
-        windowAPP.bind('<Button 3 >', editing)
-        P.pack()
-
-    def Negative():
-        N = Canvas(windowAPP, bg="Red", height=50, width=100)
-        N.bind('<Button 1 >', onMove)
-        N.bind('<Button 3 >', editing)
-        N.pack()
-
-    def editing(event):
-        # choices = ['Edit', 'Add Positive', 'Add Negative']
-        # variable = tkinter.StringVar()
-        # variable.set(choices[0])
-        # w = tkinter.OptionMenu(windowAPP, variable, *choices)
-        # w.pack()
-        windowAPPEdit = tkinter.Tk()
-        # windowAPPEdit.geometry(f'2x75+{event.x}+{event.y}')
-        windowAPPEdit.title("Pick")
-        btn1 = tkinter.Button(windowAPPEdit, text="Edit", fg="black", command= lambda :[Edit(), windowAPPEdit.destroy()]).grid(row=0,column=0)
-        btn2 = tkinter.Button(windowAPPEdit, text="Positive", fg="black", command=lambda :[Positive(), windowAPPEdit.destroy()]).grid(row=1,column=0)
-        btn3 = tkinter.Button(windowAPPEdit, text="Negative", fg="black", command=lambda :[Negative(), windowAPPEdit.destroy()]).grid(row=2,column=0)
+    window = tkinter.Tk()  # vytvořeni objektu
+    window.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
+    window.title("New Script")  # Pojmenování aplikace
+    frame_search = Frame(window)
+    frame_search.grid(row=1, column=2)
+    lbl_search = Label(frame_search, text='Name of the new Script', font=('bold', 12))
+    lbl_search.grid(row=1, column=1, sticky=W)
+    hostname_search = StringVar()
+    hostname_search_entry = Entry(frame_search, textvariable=hostname_search)
+    hostname_search_entry.grid(row=1, column=2)
+    c1 = tk.Checkbutton(window, text='Phishing', onvalue=1, offvalue=0).grid(row=3, column=3)
+    c2 = tk.Checkbutton(window, text='Vishing',  onvalue=1, offvalue=0).grid(row=4, column=3)
+    image = PhotoImage(file="arrow.jpg")
+    btn = Button(window, image=image, command=lambda: [window.destroy(), Back()])
+    btn.image = image
+    btn.grid(row=0, column=0)
 
 
 
 
-    C = Canvas(windowAPP, height=500, width=500)
-    Myrec = C.create_rectangle(x, y, 0, 0, fill="Blue", tags="playbutton")
-    C.create_text(50, 25, text="START", anchor="center")
-    windowAPP.bind('<Button 1 >', onMove)
-    windowAPP.bind('<Button 3 >', editing)
 
-    C.pack()
-    windowAPP.mainloop()
+    T = tk.Text(window, height=10, width=40)
+    T.grid(row=10, column=3)
+    T.insert(INSERT, "Úvodní věta")
+    # Create button for next text.
+    b1 = Button(window, text="Next", command=lambda: [retrieve_input(T)])
+    b1.grid(row=50, column=3, sticky=E)
+    b2 = Button(window, text="Save", command=lambda: [retrieve_input(T)])
+    b2.grid(row=50, column=3, sticky=W)
+
+    window.mainloop()
+
+
+
+def Back():
+    InsideApp.InsideApp()
