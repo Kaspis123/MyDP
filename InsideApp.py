@@ -6,9 +6,9 @@ import NewQ
 import Done
 import NewS
 import User_Manage
+import Testovaci
 
 def InsideApp():
-    DatabaseForScripts.start()
     windowAPP = tkinter.Tk()  # vytvořeni objektu
     windowAPP.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
     windowAPP.title("Application")  # Pojmenování aplikace
@@ -21,9 +21,12 @@ def InsideApp():
     btn4 = tkinter.Button(windowAPP, text="New Scam", fg="orange",command=lambda :[windowAPP.destroy(),NewScript()]).pack(side="left",anchor="nw")
     # if check == "admin":
     btn5 = tkinter.Button(windowAPP, text="User Management", fg="black", command=lambda :[windowAPP.destroy(),User_Mana()]).pack(side="left", anchor="nw")
+    btn6 = tkinter.Button(windowAPP, text="test", fg="black", command=lambda :[windowAPP.destroy(),Testov()]).pack(side="left", anchor="nw")
 
     windowAPP.mainloop()  # spuštění
 
+def Testov():
+    Testovaci.Test()
 def User_Mana():
     User_Manage.Managemet()
 

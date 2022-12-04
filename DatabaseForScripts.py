@@ -1,35 +1,42 @@
 import json
 
+counter = 0
+haha = -1
 
-def start():
-    data = {
-        'employees' : [
-            {
-                'name' : 'John Doe',
-                'department' : 'Marketing',
-                'place' : 'Remote'
-            },
-            {
-                'name' : 'Jane Doe',
-                'department' : 'Software Engineering',
-                'place' : 'Remote'
-            },
-            {
-                'name' : 'Don Joe',
-                'department' : 'Software Engineering',
-                'place' : 'Office'
-            }
-        ]
-    }
-    json_string = json.dumps(data)
-    # Using a JSON string
-    with open('json_data.json', 'w') as outfile:
-        outfile.write(json_string)
+def Datafromscripts(Name, option, text):
+    if option == 0:
+        option = "Phishing"
+    else:
+        option = "Vishing"
 
-    # Directly from dictionary
-    with open('json_data.json', 'w') as outfile:
-        json.dump(json_string, outfile)
+    global counter
+    counter += 1
+    # data = {
+    #     'Scripts': [
+    #         {
+    #             'id': counter,
+    #             'name': Name,
+    #             'option': option,
+    #             'text': text
+    #         },
+    #     ]
+    # }
+    # json_string = json.dumps(data)
+    #
+    # # Using a JSON string
+    # with open('json_data.json', 'w') as outfile:
+    #     outfile.write(json_string)
+    dictObj = {'id': counter, 'name': Name, 'option': option, 'text': text}
+    print(dictObj)
+    with open('json_data.json', 'r+') as fp:
+        data = json.load(fp)
+        data["Scripts"].append(dictObj)
+        fp.seek(0)
+        json.dump(data, fp, indent=4)
 
-    with open('json_data.json') as json_file:
-        data = json.load(json_file)
-        print(data)
+def ReadDataFromDatabase(number):
+    with open('json_data.json', 'r+') as fp:
+        data = json.load(fp)
+
+        print (number)
+    return data['Scripts'][number]["text"]
