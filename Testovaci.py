@@ -7,7 +7,7 @@ from tkinter.ttk import *
 import Database
 import InsideApp
 import DatabaseForScripts
-number = 0
+number = 1
 
 def Test():
     global number
@@ -27,14 +27,20 @@ def Test():
     btn2 = tk.Button(window, text="Negativni", fg="blue",command= lambda: [update2(T)]).grid(row=7, column=5)
 def update(T):
     global number
-    number += 2
+    if number >= 3:
+        number = (number * 2) + 1
+    else:
+        number += 2
     x = DatabaseForScripts.ReadDataFromDatabase(number)
     T.delete("1.0", END)
     T.insert(INSERT, x)
 
 def update2(T):
     global number
-    number += 1
+    if number >= 2:
+        number = (number * 2)
+    else:
+        number +=1
     x = DatabaseForScripts.ReadDataFromDatabase(number)
     T.delete("1.0", END)
     T.insert(INSERT, x)
@@ -42,6 +48,6 @@ def update2(T):
 
 def Back():
     global number
-    number = 0
+    number = 1
     InsideApp.InsideApp()
 

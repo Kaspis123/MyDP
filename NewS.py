@@ -10,17 +10,20 @@ import InsideApp
 a = 60
 b = 3
 x = 0
+number = 1
 def retrieve_input(T):
     input = T.get("1.0", END)
     print(input)
     T.delete("1.0", END)
     global x
+    global number
     x += 1
     if (x % 2) == 1:
-        T.insert(INSERT, "Zadejte text při negativní odpovědi")
+        T.insert(INSERT, "Zadejte text při negativní odpovědi na " + DatabaseForScripts.ReadDataFromDatabase(number))
         return input
     else:
-        T.insert(INSERT, "Zadejte text při pozitivní odpovědi")
+        T.insert(INSERT, "Zadejte text při pozitivní odpovědi" + DatabaseForScripts.ReadDataFromDatabase(number))
+        number += 1
         return input
 
 def NewS():
@@ -59,10 +62,12 @@ def NewS():
     T.grid(row=10, column=3)
     T.insert(INSERT, "Úvodní věta")
     # Create button for next text.
-    b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), retrieve_input(T)), ctverec(window)])
+    print(T.get("1.0", END))
+    b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)), ctverec(window),retrieve_input(T)])
     b1.grid(row=50, column=3, sticky=E)
     b2 = Button(window, text="Save", command=lambda: [retrieve_input(T), print_selection()])
     b2.grid(row=50, column=3, sticky=W)
+
 
     window.mainloop()
 
