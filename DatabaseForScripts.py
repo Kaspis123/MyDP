@@ -3,7 +3,8 @@ from anytree import Node, RenderTree, AnyNode
 from anytree.exporter import JsonExporter
 
 counter = 0
-haha = -1
+haha = 0
+x = 0
 
 def Datafromscripts(Name, option, text):
     if option == 0:
@@ -32,7 +33,7 @@ def Datafromscripts(Name, option, text):
     else:
 
         dictObj = {'id': counter, 'name': Name, 'option': option, 'text': text}
-        print(dictObj)
+
 
         with open('json_data.json', 'r+') as fp:
             data = json.load(fp)
@@ -42,9 +43,16 @@ def Datafromscripts(Name, option, text):
 
 
 
-def ReadDataFromDatabase(number):
+def ReadDataFromDatabase(number,name):
     with open('json_data.json', 'r+') as fp:
         data = json.load(fp)
-        number = number -1
-        print (number)
-    return data['Scripts'][number]["text"]
+        v = data['Scripts'][number]['name']
+        if v == name:
+            p = data['Scripts'][number]['id'] -1
+            number=p
+            number = number - 1
+            return data['Scripts'][number]["text"]
+        else:
+            global haha
+            haha = number + 1
+            return ReadDataFromDatabase(haha, name)

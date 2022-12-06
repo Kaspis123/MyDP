@@ -5,24 +5,23 @@ from tkinter import *
 from tkinter.ttk import *
 from Tools.scripts.pindent import start
 
+import Database
 import DatabaseForScripts
 import InsideApp
-a = 60
-b = 3
+
 x = 0
 number = 1
-def retrieve_input(T):
+def retrieve_input(T,name):
     input = T.get("1.0", END)
-    print(input)
     T.delete("1.0", END)
     global x
     global number
     x += 1
     if (x % 2) == 1:
-        T.insert(INSERT, "Zadejte text při negativní odpovědi na " + DatabaseForScripts.ReadDataFromDatabase(number))
+        T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database.databaseforscriptsread(name, number))
         return input
     else:
-        T.insert(INSERT, "Zadejte text při pozitivní odpovědi" + DatabaseForScripts.ReadDataFromDatabase(number))
+        T.insert(INSERT, "Zadejte text při pozitivní odpovědi na " + Database.databaseforscriptsread(name, number))
         number += 1
         return input
 
@@ -62,8 +61,8 @@ def NewS():
     T.grid(row=10, column=3)
     T.insert(INSERT, "Úvodní věta")
     # Create button for next text.
-    print(T.get("1.0", END))
-    b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)), ctverec(window),retrieve_input(T)])
+    b1 = Button(window, text="Next", command= lambda: [Database.databaseforscriptsinsert(print_selection(), hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get())])
+    # b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)),retrieve_input(T,hostname_search_entry.get())])
     b1.grid(row=50, column=3, sticky=E)
     b2 = Button(window, text="Save", command=lambda: [retrieve_input(T), print_selection()])
     b2.grid(row=50, column=3, sticky=W)
@@ -72,12 +71,7 @@ def NewS():
     window.mainloop()
 
 
-def ctverec(window):
-    global a, b
 
-    b2 = Button(window).grid(row=a, column=b, sticky=W)
-    b = b +1
-    print(b)
 
 def Back():
     InsideApp.InsideApp()

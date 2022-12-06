@@ -3,6 +3,36 @@ import sqlite3 as sq3
 from tkinter import messagebox
 
 import User_Manage
+id = 1
+# def databaseforscripts():
+#     con = sq3.connect("scripts.db")
+#     cur = con.cursor()
+#     cur.execute("""CREATE TABLE Scripts(
+#                     id INT ,
+#                     Option Char(25),
+#                     Name CHAR(50),
+#                     Text String(500));
+#                     """)
+def databaseforscriptsinsert(Option,Name,Text):
+    print(Name, Text)
+    global id
+    con = sq3.connect("scripts.db")
+    cur = con.cursor()
+    cur.execute("INSERT INTO Scripts (id, Option, Name, Text) VALUES (?,?,?,?)", (id, Option, Name, Text))
+
+    # cur.execute("INSERT INTO Users (id, Name, Password) VALUES (?,?,?)", (id, Name, Password))
+    id +=1
+    con.commit()
+def databaseforscriptsread(Name, number):
+    con = sq3.connect("scripts.db")
+    cur = con.cursor()
+    # cur.execute("SELECT ? FROM Data where ?=?", (column, goal, constrain,))
+    cur.execute("Select Text FROM Scripts WHERE Name = ? and  id = ?", [Name, number])
+    data = cur.fetchone()[0]
+    print(data)
+    return str(data)
+
+
 
 def create_database():
     con = sq3.connect("users.db")
