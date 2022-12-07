@@ -31,15 +31,37 @@ def initialize(window,name):
     T.grid(row=5, column=3)
     x = Database.databaseforscriptsread(name,number)
     T.insert(INSERT, x)
+    btn3 = tk.Button(window,text='Back',fg='black', command= lambda: [backbutton(T, name)]).grid(row=6,column=6)
     btn1 = tk.Button(window, text="Pozitivni", fg="green",command=lambda: [update(T,name)]).grid(row= 7, column=4)
     btn2 = tk.Button(window, text="Negativni", fg="blue",command= lambda: [update2(T,name)]).grid(row=7, column=5)
+
+
+
+def backbutton(T,name):
+    global number
+    if (number % 2) == 1:
+        number -= 1
+        number = number / 2
+        T.delete("1.0", END)
+        x = Database.databaseforscriptsread(name, number)
+        T.insert(INSERT, x)
+    else:
+        number = number / 2
+        T.delete("1.0", END)
+        x = Database.databaseforscriptsread(name, number)
+        T.insert(INSERT, x)
+
+
+
+
+
 def update(T,name):
     global number
     if number >= 3:
         number = (number * 2) + 1
     else:
         number += 2
-    x = Database.databaseforscriptsread(name,number)
+    x = Database.databaseforscriptsread(name, number)
     T.delete("1.0", END)
     T.insert(INSERT, x)
 

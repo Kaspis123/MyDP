@@ -13,21 +13,33 @@ id = 1
 #                     Name CHAR(50),
 #                     Text String(500));
 #                     """)
+
+def deleteScript(Name):
+    con = sq3.connect("Scripts.db")
+    cur = con.cursor()
+    cur.execute("DELETE FROM Scripts WHERE Name = ?", [Name])
+    con.commit()
+
+
 def databaseforscriptsinsert(Option,Name,Text):
     print(Name, Text)
-    global id
-    con = sq3.connect("scripts.db")
-    cur = con.cursor()
-    cur.execute("INSERT INTO Scripts (id, Option, Name, Text) VALUES (?,?,?,?)", (id, Option, Name, Text))
+    if Name == '' or Option == '':
+        print ("nope")
+    else:
+        global id
+        con = sq3.connect("scripts.db")
+        cur = con.cursor()
+        cur.execute("INSERT INTO Scripts (id, Option, Name, Text) VALUES (?,?,?,?)", (id, Option, Name, Text))
 
-    # cur.execute("INSERT INTO Users (id, Name, Password) VALUES (?,?,?)", (id, Name, Password))
-    id +=1
-    con.commit()
+        # cur.execute("INSERT INTO Users (id, Name, Password) VALUES (?,?,?)", (id, Name, Password))
+        id +=1
+        con.commit()
 def databaseforscriptsread(Name, number):
     con = sq3.connect("scripts.db")
     cur = con.cursor()
     # cur.execute("SELECT ? FROM Data where ?=?", (column, goal, constrain,))
     cur.execute("Select Text FROM Scripts WHERE Name = ? and  id = ?", [Name, number])
+    print(cur.execute("Select Text FROM Scripts WHERE Name = ? and  id = ?", [Name, number]))
     data = cur.fetchone()[0]
     print(data)
     return str(data)
@@ -121,3 +133,13 @@ def fetch( hostname=''):
             "SELECT * FROM Users WHERE Name LIKE ?", ('%'+hostname+'%',))
     rows = cur.fetchall()
     return rows
+
+def fetchscript( hostname=''):
+    con = sq3.connect("scripts.db")
+    cur = con.cursor()
+    cur.execute("SELECT Name FROM Scripts WHERE Name LIKE ?", ('%'+hostname+'%',))
+    rows = cur.fetchall()
+    m = [*set(rows)]
+    print (m)
+    return m
+
