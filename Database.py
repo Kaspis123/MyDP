@@ -1,6 +1,8 @@
-
+import io
 import sqlite3 as sq3
-from tkinter import messagebox
+from tkinter import messagebox, filedialog, Label
+
+from PIL import Image, ImageTk
 
 import User_Manage
 id = 1
@@ -13,6 +15,17 @@ id = 1
 #                     Name CHAR(50),
 #                     Text String(500));
 #                     """)
+
+conn = sq3.connect('images.db')
+
+# Create a table to hold the image data
+conn.execute('''
+    CREATE TABLE IF NOT EXISTS images
+    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+     name TEXT,
+     data BLOB);
+''')
+conn.commit()
 
 def deleteScript(Name):
     con = sq3.connect("Scripts.db")
@@ -142,4 +155,64 @@ def fetchscript( hostname=''):
     m = [*set(rows)]
     print (m)
     return m
+
+
+def insert_image():
+    # Open a file dialog and get the selected file path
+    file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")])
+
+    # Load the image file using the PIL library
+    with open(file_path, 'rb') as f:
+        data = f.read()
+
+    # Extract the filename from the path
+    file_name = file_path.split("/")[-1]  # For Unix-based systems
+    # file_name = file_path.split("\\")[-1]  # For Windows
+    print(file_name)
+
+
+    # Insert the image data into the database
+    conn.execute('INSERT INTO images (name, data) VALUES (?, ?)', (file_name, data))
+    conn.commit()
+
+
+def display_image(event, window):
+    # Get the selected item from the listbox
+    selection = event.widget.curselection()
+    if selection:
+
+            selected_item = event.widget.get(selection[0])
+
+            # Query the database for the image data
+            result = conn.execute('SELECT data FROM images WHERE name = ?', (selected_item,))
+
+            # Load the image data into memory using the BytesIO class
+            image_data = io.BytesIO(result.fetchone()[0])
+
+            # Create a PIL Image from the loaded image data
+            pil_image = Image.open(image_data)
+
+            # Create a Tkinter PhotoImage from the PIL image
+            photo = ImageTk.PhotoImage(pil_image)
+            label = Label(window)
+            label.pack()
+            label.config(image=photo)
+            label.image = photo
+
+def delete_image_from_db(name):
+    # Delete the selected image from the database
+    con = sq3.connect("images.db")
+    cur = con.cursor()
+    cur.execute('DELETE FROM images WHERE name = ?', (name,))
+    con.commit()
+
+
+
+
+
+
+
+
+
+
 

@@ -1,16 +1,27 @@
+import io
 import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import Canvas, messagebox
 from tkinter import *
 from tkinter.ttk import *
 from Tools.scripts.pindent import start
-
+import Change_Link
 import Database
 import DatabaseForScripts
 import InsideApp
+import pyperclip
+from tkinter import filedialog
+from PIL import ImageTk, Image
 
 x = 0
 number = 1
+resize_count = 0
+
+
+class CustomPhotoImage(ImageTk.PhotoImage):
+    def __init__(self, pil_image):
+        super().__init__(pil_image)
+        self.pil_image = pil_image
 def retrieve_input(T,name,option,window):
     input = T.get("1.0", END)
     T.delete("1.0", END)
@@ -32,21 +43,33 @@ def retrieve_input(T,name,option,window):
             number += 1
             return input
 
+
+
+
+
 def NewS():
-    window = tkinter.Tk()  # vytvořeni objektu
+    window = tk.Tk()  # vytvořeni objektu
     window.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
     window.title("New Script")  # Pojmenování aplikace
+
     frame_search = Frame(window)
-    frame_search.grid(row=1, column=2)
+    frame_search.grid(row=1, column=3)
+
     lbl_search = Label(frame_search, text='Name of the new Script', font=('bold', 12))
-    lbl_search.grid(row=1, column=1, sticky=W)
+    lbl_search.grid(row=1, column=1, sticky=tk.W)
+
     hostname_search = StringVar()
     hostname_search_entry = Entry(frame_search, textvariable=hostname_search)
-    hostname_search_entry.grid(row=1, column=2)
-    var1 = IntVar()
-    var2 = IntVar()
-    c1 = tk.Checkbutton(window, variable=var1, text='Phishing', onvalue=1, offvalue=0).grid(row=3, column=3)
-    c2 = tk.Checkbutton(window ,variable=var2, text='Vishing',  onvalue=1, offvalue=0).grid(row=4, column=3)
+    hostname_search_entry.grid(row=1, column=3)
+
+    var1 = tk.IntVar()
+    var2 = tk.IntVar()
+
+    c1 = tk.Checkbutton(window, variable=var1, text='Phishing', onvalue=1, offvalue=0)
+    c1.grid(row=11, column=2, padx=(10, 0), pady=0)
+
+    c2 = tk.Checkbutton(window, variable=var2, text='Vishing  ', onvalue=1, offvalue=0)
+    c2.grid(row=12, column=2, padx=(10, 0), pady=0)
     image = PhotoImage(file="arrow.jpg")
     btn = Button(window, image=image, command=lambda: [window.destroy(), Back()])
     btn.image = image
@@ -62,46 +85,123 @@ def NewS():
         else:
             messagebox.showerror("Error", "Cant use both")
 
-
-
     T = tk.Text(window, height=10, width=40)
-    T.grid(row=10, column=3)
-    T.insert(INSERT, "Úvodní věta")
+    T.grid(row=10, column=3, rowspan=35, padx=10, pady=10, sticky="NSEW")
+    T.insert(tk.INSERT, "Úvodní věta")
     # Create button for next text.
     b1 = Button(window, text="Next and Save", command= lambda: [Database.databaseforscriptsinsert(print_selection(), hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(),print_selection(), window)])
     # b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)),retrieve_input(T,hostname_search_entry.get())])
     b1.grid(row=50, column=3, sticky=E)
-    b2 = Button(window, text="Delete", command=lambda: [deleteScript(hostname_search.get(),bar_tree_view)])
-    b2.grid(row=50, column=3, sticky=W)
-    frame_bar = Frame(window)
-    frame_bar.grid(row=20, column=0, columnspan=4, rowspan=6, pady=20, padx=20)
 
-    columns = ['id', 'Name']
-    bar_tree_view = Treeview(frame_bar, columns=columns, show="headings")
-    bar_tree_view.column("id", width=30)
-    for col in columns[1:]:
-        bar_tree_view.column(col, width=120)
-        bar_tree_view.heading(col, text=col)
-    bar_tree_view.bind('<<TreeviewSelect>>', )
-    bar_tree_view.pack(side="left", anchor="center", fill="y")
-    scrollbar = Scrollbar(frame_bar, orient='vertical')
-    scrollbar.configure(command=bar_tree_view.yview)
-    scrollbar.pack(side="right", fill="y")
-    bar_tree_view.config(yscrollcommand=scrollbar.set)
-    frame_btns = Frame(window)
-    frame_btns.grid(row=3, column=0)
-
-    populate_list(bar_tree_view, )
+    bitly_var = StringVar()
+    bitly = Entry(window, textvariable=bitly_var)
+    bitly.grid(row=70, column=3, sticky=E)
+    Button(window, text="Get Short URL", command=lambda: [Changelink(bitly.get(),bitly_var)]).grid(row=71, column=3)
 
 
+
+    # Create a button to open the file dialog
+    button = Button(window, text="Select Image", command=lambda : [Database.insert_image(),update_listbox()])
+    button.grid(row = 72, column= 3)
+    # button = Button(window, text="Show Image", command=lambda: [Database.display_image(hostname_search.get())])
+    # button.grid(row=74, column=3)
+
+    def display_image(event):
+        # Get the selected item from the listbox
+        selection = event.widget.curselection()
+        if selection:
+            index = selection[0]
+            item = event.widget.get(index)
+            image_data = Database.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
+
+            # Load the image data into a PIL Image object
+            pil_image = Image.open(io.BytesIO(image_data))
+
+            # Create a new window to display the image
+            top = tk.Toplevel()
+            top.title(item)
+            top.protocol("WM_DELETE_WINDOW", lambda: on_closing(top))
+
+            # Create a Tkinter PhotoImage from the PIL Image object
+            tk_image = ImageTk.PhotoImage(pil_image)
+
+            # Add the image to a label and display it in the window
+            label = tk.Label(top, image=tk_image)
+            label.pack(fill=tk.BOTH, expand=True, anchor="center")
+
+            # Bind the resize function to the <Configure> event of the window
+            top.bind('<Configure>', lambda e: resize_image(label, tk_image, e.width, e.height))
+            top.bind("<Destroy>", lambda e: on_closing(top))
+
+    def on_closing(window):
+        global resize_count
+        resize_count = 0
+        window.destroy()
+    def resize_image(label, tk_image, new_width, new_height):
+        global resize_count
+
+        # Only resize the image if the window has been resized by the user
+        if resize_count > 1:
+            # Get the PIL Image from the PhotoImage object
+            pil_image = ImageTk.getimage(tk_image).copy()
+            # Resize the PIL Image
+            pil_image = pil_image.resize((new_width, new_height), Image.ANTIALIAS)
+            # Convert the PIL Image to a PhotoImage object
+            resized_image = ImageTk.PhotoImage(pil_image)
+            # Update the PhotoImage object in the label
+            label.configure(image=resized_image)
+            # Store a reference to the PhotoImage object to prevent it from being garbage collected
+            label.image = resized_image
+
+        # Increment the resize count
+        resize_count += 1
+    resize_count = 0
+    print(resize_count)
+
+
+
+    def delete_image(event):
+        # Get the selected item from the listbox
+        selection = event.widget.curselection()
+        if selection:
+            selected_item = event.widget.get(selection[0])
+
+            # Create a popup menu with the option to delete the selected image
+            popup_menu = Menu(window, tearoff=0)
+            popup_menu.add_command(label="Delete", command=lambda :[Database.delete_image_from_db(selected_item), update_listbox()])
+            popup_menu.add_command(label="Show", command=lambda event=event: [display_image(event), update_listbox()])
+
+            # Display the popup menu at the mouse position
+            try:
+                popup_menu.tk_popup(event.x_root, event.y_root, 0)
+            finally:
+                popup_menu.grab_release()
+
+
+    def update_listbox():
+        # Clear the listbox
+        listbox.delete(0, END)
+
+        # Insert the current image names from the database into the listbox
+        for row in Database.conn.execute('SELECT name FROM images'):
+            listbox.insert(END, row[0])
+
+    listbox = Listbox(window)
+    update_listbox()
+    listbox.grid(row=75, column=3)
+    listbox.bind('<Double-1>', display_image)
+    listbox.bind("<Button-3>", delete_image)
 
     window.mainloop()
 
 
-def deleteScript(Name,router):
-    Database.deleteScript(Name)
-    populate_list(router)
 
+
+def Changelink(url,bitly_var):
+    x = Change_Link.bitlylink(url)
+    print(x)
+    bitly_var.set(x)
+    pyperclip.copy(bitly_var.get())
 
 
 def Back():
@@ -111,11 +211,7 @@ def Back():
     number = 1
     InsideApp.InsideApp()
 
-def populate_list(bar_tree_view, hostname=''):
-    for i in bar_tree_view.get_children():
-        bar_tree_view.delete(i)
-    for row in Database.fetchscript(hostname):
-        bar_tree_view.insert('', 'end', values=row)
+
 
 
 

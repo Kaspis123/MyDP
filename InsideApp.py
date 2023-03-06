@@ -7,6 +7,8 @@ import Done
 import NewS
 import User_Manage
 import Testovaci
+import Send_SMS
+import Change_Link
 
 def InsideApp():
     windowAPP = tkinter.Tk()  # vytvořeni objektu
@@ -22,6 +24,9 @@ def InsideApp():
     # if check == "admin":
     btn5 = tkinter.Button(windowAPP, text="User Management", fg="black", command=lambda :[windowAPP.destroy(),User_Mana()]).pack(side="left", anchor="nw")
     btn6 = tkinter.Button(windowAPP, text="test", fg="black", command=lambda :[windowAPP.destroy(),Testov()]).pack(side="left", anchor="nw")
+
+
+
 
     windowAPP.mainloop()  # spuštění
 
