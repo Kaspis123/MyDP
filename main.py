@@ -1,7 +1,7 @@
 import tkinter
 import InsideApp
 from PIL import ImageTk,Image
-import Database
+import Database_scripts
 from tkinter import  messagebox
 import sqlite3 as sq3
 # Press Shift+F10 to execute it or replace it with your code.
@@ -26,8 +26,12 @@ def resize_widgets(event):
 
 def Log_in():
     # Check = Database.get_data_from_database(EntryUser.get(), PasswordEntry.get())
+    print(EntryUser.get())
+    InsideApp.set_name(EntryUser.get())
     window.destroy()
     InsideApp.InsideApp()
+
+
 
     # x = EntryUser.get()
     # if Check == True:

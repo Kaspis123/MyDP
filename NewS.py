@@ -6,42 +6,71 @@ from tkinter import *
 from tkinter.ttk import *
 from Tools.scripts.pindent import start
 import Change_Link
-import Database
-import DatabaseForScripts
+import Database_scripts
+import Database_images
 import InsideApp
 import pyperclip
-from tkinter import filedialog
 from PIL import ImageTk, Image
 
-x = 0
+
+x = 1
 number = 1
+y = 1
 resize_count = 0
+flag = True
 
 
-class CustomPhotoImage(ImageTk.PhotoImage):
-    def __init__(self, pil_image):
-        super().__init__(pil_image)
-        self.pil_image = pil_image
+def button(T,name,option,window):
+    # T.delete("1.0", END)  # Clear the text from the input area
+    # T.insert(INSERT,"Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
+    global x
+    global y
+    global number
+    T.delete("1.0", END)  # Clear the text from the input area
+    T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
+    y+=1
+
+
+
 def retrieve_input(T,name,option,window):
-    input = T.get("1.0", END)
-    T.delete("1.0", END)
     global x
     global number
-    x += 1
+    global y
+    global flag
+
+
+
+    input = T.get("1.0", END)
+    T.delete("1.0", END)  # Clear the text from the input area
+    Button(window, text="Stop this Branch", command=lambda : [button(T,name,option,window)]).grid(row=50, column=2, sticky=E)
     if name == '' or option == None:
-        x = 0
-        number = 1
+        x = 1
+        number = 0
         window.destroy()
         NewS()
         messagebox.showerror("Error", "No data provided")
     else:
-        if (x % 2) == 1:
-            T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database.databaseforscriptsread(name, number))
-            return input
+        if flag:
+            T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
+            y += 1
+            print(y)
+            print("zadava se negativni")
         else:
-            T.insert(INSERT, "Zadejte text při pozitivní odpovědi na " + Database.databaseforscriptsread(name, number))
+            T.insert(INSERT, "Zadejte text při pozitivní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
+            print("zadava se pozitivni")
+            x += 1
+        if y > x:
+            flag = False
+            y = 1
+        else:
+            flag = True
             number += 1
-            return input
+            print("Změna number z ", number - 1,  "Na number", number)
+    return input
+
+
+
+
 
 
 
@@ -89,7 +118,8 @@ def NewS():
     T.grid(row=10, column=3, rowspan=35, padx=10, pady=10, sticky="NSEW")
     T.insert(tk.INSERT, "Úvodní věta")
     # Create button for next text.
-    b1 = Button(window, text="Next and Save", command= lambda: [Database.databaseforscriptsinsert(print_selection(), hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(),print_selection(), window)])
+    b1 = Button(window, text="Next and Save", command= lambda: [Database_scripts.databaseforscriptsinsert(print_selection(), hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(),print_selection(), window)])
+
     # b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)),retrieve_input(T,hostname_search_entry.get())])
     b1.grid(row=50, column=3, sticky=E)
 
@@ -101,10 +131,9 @@ def NewS():
 
 
     # Create a button to open the file dialog
-    button = Button(window, text="Select Image", command=lambda : [Database.insert_image(),update_listbox()])
+    button = Button(window, text="Select Image", command=lambda : [Database_images.insert_image(hostname_search.get()),update_listbox()])
     button.grid(row = 72, column= 3)
-    # button = Button(window, text="Show Image", command=lambda: [Database.display_image(hostname_search.get())])
-    # button.grid(row=74, column=3)
+
 
     def display_image(event):
         # Get the selected item from the listbox
@@ -112,7 +141,7 @@ def NewS():
         if selection:
             index = selection[0]
             item = event.widget.get(index)
-            image_data = Database.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
+            image_data = Database_images.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
 
             # Load the image data into a PIL Image object
             pil_image = Image.open(io.BytesIO(image_data))
@@ -120,6 +149,7 @@ def NewS():
             # Create a new window to display the image
             top = tk.Toplevel()
             top.title(item)
+            top.maxsize(width=1200, height=1200)
             top.protocol("WM_DELETE_WINDOW", lambda: on_closing(top))
 
             # Create a Tkinter PhotoImage from the PIL Image object
@@ -156,7 +186,7 @@ def NewS():
         # Increment the resize count
         resize_count += 1
     resize_count = 0
-    print(resize_count)
+    # print(resize_count)
 
 
 
@@ -168,7 +198,7 @@ def NewS():
 
             # Create a popup menu with the option to delete the selected image
             popup_menu = Menu(window, tearoff=0)
-            popup_menu.add_command(label="Delete", command=lambda :[Database.delete_image_from_db(selected_item), update_listbox()])
+            popup_menu.add_command(label="Delete", command=lambda :[Database_images.delete_image_from_db(selected_item), update_listbox()])
             popup_menu.add_command(label="Show", command=lambda event=event: [display_image(event), update_listbox()])
 
             # Display the popup menu at the mouse position
@@ -183,7 +213,7 @@ def NewS():
         listbox.delete(0, END)
 
         # Insert the current image names from the database into the listbox
-        for row in Database.conn.execute('SELECT name FROM images'):
+        for row in Database_images.conn.execute('SELECT name FROM images'):
             listbox.insert(END, row[0])
 
     listbox = Listbox(window)
@@ -206,9 +236,13 @@ def Changelink(url,bitly_var):
 
 def Back():
     global x
-    x = 0
+    x = 1
     global number
     number = 1
+    global y
+    y = 1
+    global flag
+    flag = True
     InsideApp.InsideApp()
 
 
