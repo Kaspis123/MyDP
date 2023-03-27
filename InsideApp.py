@@ -18,7 +18,7 @@ def InsideApp():
     windowAPP = tkinter.Tk()  # vytvořeni objektu
     windowAPP.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
     windowAPP.title("Application")  # Pojmenování aplikace
-    btn1 = tkinter.Button(windowAPP, text="New Quest",fg="green",command=lambda: [windowAPP.destroy(),NewQuest()]).pack(side="left",anchor="nw")  # 'fg or foreground' is for coloring the contents (buttons)
+    btn1 = tkinter.Button(windowAPP, text="New Quest",fg="green",command=lambda: [NewQuest()]).pack(side="left",anchor="nw")  # 'fg or foreground' is for coloring the contents (buttons)
 
     btn2 = tkinter.Button(windowAPP, text="Running", fg="purple",command=RunningQuests).pack(side="left",anchor="nw")
 

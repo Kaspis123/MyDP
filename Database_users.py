@@ -31,3 +31,14 @@ def delete_user(name):
     conn.execute('DELETE FROM users WHERE name = ?', (name,))
     conn.commit()
     print(f'User "{name}" deleted from the database')
+
+
+def user_exists(name):
+    print(name)
+    cursor = conn.execute("SELECT name FROM users WHERE name=? ", (name,))
+    check = cursor.fetchone()
+    print(check)
+    if check != None:
+        return 0
+    conn.commit()
+
