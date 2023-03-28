@@ -8,12 +8,11 @@ from User_Manage import get_team_members
 conn = sqlite3.connect('tasks.db')
 # Create a table to hold the image data
 conn.execute('''CREATE TABLE IF NOT EXISTS tasks
-                 (name text, description text, creation_date text, due_date text, employee text, viewed bool)''')
+                 (name text, description text, creation_date text, due_date text, employee text, viewed bool, pdf text)''')
 conn.commit()
 
 
-def insert_task(task_name, task_description, task_creation_date, task_due_date, task_employee):
-
+def insert_task(task_name, task_description, task_creation_date, task_due_date, task_employee, pdf_name):
     c = conn.cursor()
     c.execute("SELECT name FROM tasks WHERE name=? ", (task_name,))
     check = c.fetchone()
@@ -27,8 +26,8 @@ def insert_task(task_name, task_description, task_creation_date, task_due_date, 
         NewQ.error_user_name()
         return 1
     else:
-        c.execute("INSERT INTO tasks VALUES (?, ?, ?, ?, ?,?)",
-              (task_name, task_description, task_creation_date, task_due_date, task_employee, False))
+        c.execute("INSERT INTO tasks VALUES (?, ?, ?, ?, ?,?,?)",
+              (task_name, task_description, task_creation_date, task_due_date, task_employee, False, pdf_name))
         conn.commit()
         return 2
 
@@ -54,7 +53,7 @@ def get_new_tasks(name1):
     return i
 
 
-def add_task_for_team(team_name, task_name, task_description, task_due_date):
+def add_task_for_team(team_name, task_name, creation_date, task_description, task_due_date, pdf):
     # Get the members of the team from the database
     members = get_team_members(team_name)
     print(members)
@@ -62,8 +61,8 @@ def add_task_for_team(team_name, task_name, task_description, task_due_date):
     # Add the task for each member of the team
     for member in members:
         # Add the task to the tasks table for the member
-        conn.execute('''INSERT INTO tasks (name, description, creation_date, due_date, employee, viewed)
-                        VALUES (?, ?, ?, ?, ?, ?)''', (task_name, task_description, datetime.now(), task_due_date, member[0], False))
+        conn.execute('''INSERT INTO tasks (name, description, creation_date, due_date, employee, viewed, pdf)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)''', (task_name, task_description, creation_date, task_due_date, member[0], False, pdf))
 
     conn.commit()
 

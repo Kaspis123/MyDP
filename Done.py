@@ -10,6 +10,8 @@ from tkinter import *
 from tkinter.ttk import *
 from datetime import date, datetime
 
+from Quests import show_pdf_file
+
 
 def Done():
     windowAPP = tkinter.Tk()  # vytvořeni objektu
@@ -109,12 +111,21 @@ def open(event):
     finished_date_entry.set_date(finished_date)
     finished_date_entry.configure(state="disabled")
     finished_date_entry.grid(row=5, column=1, padx=5, pady=5, sticky=W)
+    if task[6] != '':
+        pdf_label = Label(window, text="PDF:")
+        pdf_label.grid(row=6, column=0, padx=5, pady=5, sticky=W)
+        pdf_entry = Entry(window)
+        pdf_entry.insert(END, task[6])
+        pdf_entry.configure(state="readonly")
+        pdf_entry.grid(row=6, column=1, padx=5, pady=5, sticky=W)
 
-
+        # Create the close button
+        open_button = Button(window, text="Open", command=lambda: [show_pdf_file(pdf_entry.get())])
+        open_button.grid(row=6, column=1, padx=(88, 0))
 
     # Create the close button
     close_button = Button(window, text="Close", command=window.destroy)
-    close_button.grid(row=6, column=1, padx=5, pady=5, sticky=E)
+    close_button.grid(row=7, column=1, padx=5, pady=5, sticky=E)
 
     # Make the window modal
     window.focus_set()

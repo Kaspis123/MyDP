@@ -14,7 +14,7 @@ import InsideApp
 def Managemet():
     window = tk.Tk()
     window.title("Management")
-    window.geometry("800x600")
+    window.geometry("700x500")
 
     # Create an image button
     image = tk.PhotoImage(file="arrow.jpg")
@@ -51,10 +51,14 @@ def Managemet():
     listbox.pack(side="left", expand=False, fill="both", padx=10)
 
     scrollbar.config(command=listbox.yview)
+
+    scrollbar2 = tk.Scrollbar(frame, orient="vertical")
+    scrollbar2.pack(side="right", fill="y")
     listbox_teams = tk.Listbox(frame, height=10, width=25, font=("Helvetica", 14), bd=2, bg="#ffffff",
                                selectbackground="#cccccc", highlightthickness=0,
-                               selectmode=BROWSE,justify="center")
-    listbox_teams.pack(side="left", expand=False, fill="both", padx=20)
+                               selectmode=BROWSE,justify="center",yscrollcommand=scrollbar2.set)
+    listbox_teams.pack(side="right", expand=False, fill="both", padx=20)
+    scrollbar2.config(command=listbox_teams.yview)
 
     # Create a frame for the add and delete user buttons
     button_frame = tk.Frame(window)
@@ -70,9 +74,9 @@ def Managemet():
 
 
     btn_add_team = tk.Button(button_frame,text="Add Team", fg="black",command= lambda: add_team())
-    btn_add_team.pack(side= "bottom",padx=10, pady=10 )
+    btn_add_team.pack(side= "right",padx=(0,130), pady=10 )
     btn_del_team = tk.Button(button_frame,text="Delete Team", fg="black",command= lambda: del_team())
-    btn_del_team.pack(side= "bottom",padx=10, pady=10 )
+    btn_del_team.pack(side= "right",padx=10, pady=10 )
     listbox_teams.bind('<Double-1>', lambda event: show_team_members(listbox_teams.get(ANCHOR)))
 
 

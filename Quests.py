@@ -6,9 +6,12 @@ import sqlite3
 from datetime import datetime
 from tkcalendar import DateEntry
 from datetime import date
+from tkPDFViewer import tkPDFViewer as pdf
 
+import Database_teams
 import Finished_Tasks
-
+import tkinter as tk
+from tkinter import filedialog
 
 def show(name1):
     # Create the tasks window
@@ -57,6 +60,8 @@ def show(name1):
             # Add the item to the listbox with the appropriate background color
             tasks_listbox.insert(END, row[0])
             tasks_listbox.itemconfig(END, bg=color)
+
+
     getlistbox()
 
 
@@ -73,7 +78,7 @@ def show(name1):
 
             # Create a popup menu with the option to delete the selected image
             popup_menu = Menu(tasks_window, tearoff=0)
-            popup_menu.add_command(label="Mark as Finished", command= lambda: [mark_as_finished(selected_item),getlistbox()])
+            popup_menu.add_command(label="Mark as Finished", command= lambda: [mark_as_finished(selected_item,name1),getlistbox()])
             popup_menu.add_command(label="Show", command=lambda event=event: open_task_window(tasks_listbox.get(ANCHOR)))
 
             # Display the popup menu at the mouse position
@@ -138,8 +143,6 @@ def open_task_window(task_name):
     day_label = Label(window, text="Days to finish: " + str(days_remaining))
     day_label.grid(row=3, column=1, padx=5, pady=5, sticky=W)
 
-
-
     # Create the task employee label and entry field
     # employee_label = Label(window, text="Task Employee:")
     # employee_label.grid(row=3, column=0, padx=5, pady=5, sticky=W)
@@ -147,8 +150,19 @@ def open_task_window(task_name):
     # employee_entry.insert(0, task[4])
     # employee_entry.configure(state="disabled")
     # employee_entry.grid(row=3, column=1, padx=5, pady=5, sticky=W)
+    if task[6] != '':
 
-    # Create the close button
+        pdf_label = Label(window, text="PDF:")
+        pdf_label.grid(row=4, column=0, padx=5, pady=5, sticky=W)
+        pdf_entry = Entry(window)
+
+        pdf_entry.insert(END, task[6])
+        pdf_entry.configure(state="readonly")
+        pdf_entry.grid(row=4, column=1, padx=5, pady=5, sticky=W)
+
+        # Create the close button
+        open_button = Button(window,text="Open", command=lambda: [show_pdf_file(pdf_entry.get())])
+        open_button.grid(row=4, column=1, padx=(88, 0))
     close_button = Button(window, text="Close", command=window.destroy)
     close_button.grid(row=3, column=1, padx=5, pady=5, sticky=E)
 
@@ -157,13 +171,29 @@ def open_task_window(task_name):
     window.grab_set()
     window.wait_window()
 
-def mark_as_finished(event):
+def show_pdf_file(entry):
+    new_window = Toplevel()
+    new_window.resizable(True, True)
+    new_window.title("PDF File")
+    window_width = 600
+    window_height = 600
+    screen_width = new_window.winfo_screenwidth()
+    screen_height = new_window.winfo_screenheight()
+    x = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    new_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    file_path = "pdf_files/" + entry
+    if file_path:
+        v1 = pdf.ShowPdf()
+        v2 = v1.pdf_view(new_window, pdf_location=open(file_path, "r"))
+        v2.pack()
+def mark_as_finished(event,name1):
     current_date = date.today()
     formatted_date = current_date.strftime("%d/%m/%Y")
     c = Database_tasks.conn.cursor()
-    c.execute("SELECT * FROM tasks WHERE name=?", (event,))
+    c.execute("SELECT * FROM tasks WHERE name=? AND employee=?", (event, name1))
     task = c.fetchone()
-    Finished_Tasks.insert_task(task[0],task[1],task[2],task[3],task[4],formatted_date)
+    Finished_Tasks.insert_task(task[0], task[1], task[2], task[3], task[4], formatted_date, task[6])
     c.close()
     Database_tasks.delete_task(event)
 

@@ -69,13 +69,6 @@ def retrieve_input(T,name,option,window):
     return input
 
 
-
-
-
-
-
-
-
 def NewS():
     window = tk.Tk()  # vytvořeni objektu
     window.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace

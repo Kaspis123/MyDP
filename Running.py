@@ -5,7 +5,8 @@ import sqlite3
 from datetime import datetime
 from tkcalendar import DateEntry
 from datetime import date
-from Quests import  show
+from Quests import show, show_pdf_file
+
 
 def Running():
     # Create the tasks window
@@ -139,10 +140,21 @@ def open_task_window(task_name):
     days_remaining = (due_date - date.today()).days
     day_label = Label(window, text="Days to finish: " + str(days_remaining))
     day_label.grid(row=5, column=1, padx=5, pady=5, sticky=W)
+    if task[6] != '':
+        pdf_label = Label(window, text="PDF:")
+        pdf_label.grid(row=6, column=0, padx=5, pady=5, sticky=W)
+        pdf_entry = Entry(window)
+        pdf_entry.insert(END, task[6])
+        pdf_entry.configure(state="readonly")
+        pdf_entry.grid(row=6, column=1, padx=5, pady=5, sticky=W)
+
+        # Create the close button
+        open_button = Button(window, text="Open", command=lambda: [show_pdf_file(pdf_entry.get())])
+        open_button.grid(row=6, column=1, padx=(88, 0))
 
     # Create the close button
     close_button = Button(window, text="Close", command=window.destroy)
-    close_button.grid(row=3, column=1, padx=5, pady=5, sticky=E)
+    close_button.grid(row=7, column=1, padx=(0, 50), pady=5)
 
 
     window.focus_set()
