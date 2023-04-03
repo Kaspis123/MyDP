@@ -1,14 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox
-
 import io
 from tkinter import *
 from tkinter.ttk import *
-
-from tkinter import ttk
-
-import Database_images
 import Database_scripts
+import Database_teams
 import InsideApp
 from PIL import ImageTk, Image
 number = 1
@@ -107,7 +102,7 @@ def Test():
                 item = event.widget.get(index)
                 if item == "Default Images" or item == "End of Default Images":
                     return
-                image_data = Database_images.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
+                image_data = Database_teams.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
 
                 # Load the image data into a PIL Image object
                 pil_image = Image.open(io.BytesIO(image_data))
@@ -183,13 +178,13 @@ def Test():
             # Insert the default items
             listbox_images.insert(END, "Default Images")
             listbox_images.itemconfig(0, fg=DEFAULT_COLOR)
-            for row in Database_images.conn.execute('SELECT name FROM images WHERE skript=?', ("default",)):
+            for row in Database_teams.conn.execute('SELECT name FROM images WHERE skript=?', ("default",)):
                 listbox_images.insert(END, row[0])
             listbox_images.insert(END, "End of Default Images")
             p = listbox_images.size()
             listbox_images.itemconfig(p-1 , fg=DEFAULT_COLOR)
 
-            for row in Database_images.conn.execute('SELECT name FROM images WHERE skript=?', (skript,)):
+            for row in Database_teams.conn.execute('SELECT name FROM images WHERE skript=?', (skript,)):
                 listbox_images.insert(END, row[0])
 
         update_listbox_image()

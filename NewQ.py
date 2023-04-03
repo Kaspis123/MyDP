@@ -4,9 +4,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
 from tkcalendar import DateEntry
-import Database_tasks
 import Database_teams
-import Database_users
 from datetime import date
 global x
 import tkinter as tk
@@ -113,12 +111,12 @@ def error_user_name():
 
 def give_to_database(name_entry, description_entry, creation_date_entry, due_date_entry, employee_entry, window, x, pdf):
     if x == 0:
-        p = Database_tasks.insert_task(name_entry, description_entry, creation_date_entry, due_date_entry, employee_entry, pdf)
+        p = Database_teams.insert_task(name_entry, description_entry, creation_date_entry, due_date_entry, employee_entry, pdf)
         window.lift()
         if p != 0 and p != 1:
             window.destroy()
     else:
-        Database_tasks.add_task_for_team(employee_entry, name_entry, creation_date_entry, description_entry, due_date_entry, pdf)
+        Database_teams.add_task_for_team(employee_entry, name_entry, creation_date_entry, description_entry, due_date_entry, pdf)
         window.destroy()
 
 def switch_to_teams(listbox):
@@ -139,7 +137,7 @@ def switch_to_users(listbox):
         x = 0
     listbox.delete(0, END)
     listbox.insert(END, "{:<30} {:^30}".format("ID", "Name"))
-    for row in Database_users.conn.execute('SELECT id, name FROM users'):
+    for row in Database_teams.conn.execute('SELECT id, name FROM users'):
         listbox.insert(END, "{:<30} {:^30}".format(row[0], row[1]))
 
 
@@ -167,7 +165,7 @@ def choose_user(employee_entry):
     switch_button.pack()
     switch_button_users = Button(new_window, text="Users", command=lambda: [switch_to_users(listbox)])
     switch_button_users.pack()
-    for row in Database_users.conn.execute('SELECT id, name FROM users'):
+    for row in Database_teams.conn.execute('SELECT id, name FROM members'):
         listbox.insert(END, "{:<30} {:^30}".format(row[0], row[1]))
 
     def double_click(event):

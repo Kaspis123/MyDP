@@ -5,6 +5,8 @@ import sqlite3
 from datetime import datetime
 from tkcalendar import DateEntry
 from datetime import date
+
+import Database_teams
 from Quests import show, show_pdf_file
 
 
@@ -37,8 +39,9 @@ def Running():
     # Insert default value
     tasks_listbox.insert(END, "{:<30} {:^30}".format("Name of the task", "Name of the employee"))
 
-    for row in Database_tasks.conn.execute(
-            'SELECT name, employee, due_date FROM tasks ORDER BY due_date ', ):
+
+    for row in Database_teams.conn.execute('SELECT name, employee, due_date FROM tasks ORDER BY due_date ' ):
+
         # Parse the due date from the database row
         due_date_str = row[2]
         due_date = datetime.strptime(due_date_str, '%d/%m/%Y').date()
@@ -55,9 +58,11 @@ def Running():
             color = ORANGE
         else:
             color = GREEN
-
+        base = 70
+        h = len(row[0])
+        dd = base - h
         # Add the item to the listbox with the appropriate background color
-        tasks_listbox.insert(END, "{:<30} {:^30}".format(row[0], row[1]))
+        tasks_listbox.insert(END, "{:<{}} {:^0}".format(row[0],dd, row[1] ))
         tasks_listbox.itemconfig(END, bg=color)
 
 
@@ -68,7 +73,7 @@ def Running():
         task_name, employee_name = selected_text.split()
         bbox = tasks_listbox.bbox(ANCHOR)
         if event.x < (bbox[0] + bbox[2]) / 2:
-            open_task_window(task_name)
+            open_task_window(task_name,employee_name)
         else:
             show(employee_name)
 
@@ -77,12 +82,12 @@ def Running():
 
 
 
-def open_task_window(task_name):
+def open_task_window(task_name,employee_name):
     print(task_name)
     if task_name == "Name of the task              Name of the employee":
         return
-    c = Database_tasks.conn.cursor()
-    c.execute("SELECT * FROM tasks WHERE name=?", (task_name,))
+    c = Database_teams.conn.cursor()
+    c.execute("SELECT * FROM tasks WHERE name=? AND employee=? ", (task_name, employee_name))
     task = c.fetchone()
     c.close()
 

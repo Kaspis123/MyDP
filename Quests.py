@@ -1,8 +1,7 @@
 
-import Database_tasks
+
 from tkinter import *
-from tkinter import ttk
-import sqlite3
+
 from datetime import datetime
 from tkcalendar import DateEntry
 from datetime import date
@@ -10,8 +9,7 @@ from tkPDFViewer import tkPDFViewer as pdf
 
 import Database_teams
 import Finished_Tasks
-import tkinter as tk
-from tkinter import filedialog
+
 
 def show(name1):
     # Create the tasks window
@@ -37,7 +35,7 @@ def show(name1):
 
         # Insert default value
         tasks_listbox.insert(END, "Name")
-        for row in Database_tasks.conn.execute(
+        for row in Database_teams.conn.execute(
                 'SELECT name, due_date FROM tasks WHERE employee=? ORDER BY due_date ',
                 (name1,)):
             # Parse the due date from the database row
@@ -94,7 +92,7 @@ def show(name1):
 def open_task_window(task_name):
     if task_name == "Name":
         return
-    c = Database_tasks.conn.cursor()
+    c = Database_teams.conn.cursor()
     c.execute("SELECT * FROM tasks WHERE name=?", (task_name,))
     task = c.fetchone()
     c.close()
@@ -190,12 +188,12 @@ def show_pdf_file(entry):
 def mark_as_finished(event,name1):
     current_date = date.today()
     formatted_date = current_date.strftime("%d/%m/%Y")
-    c = Database_tasks.conn.cursor()
+    c = Database_teams.conn.cursor()
     c.execute("SELECT * FROM tasks WHERE name=? AND employee=?", (event, name1))
     task = c.fetchone()
     Finished_Tasks.insert_task(task[0], task[1], task[2], task[3], task[4], formatted_date, task[6])
     c.close()
-    Database_tasks.delete_task(event)
+    Database_teams.delete_task(event)
 
 
 

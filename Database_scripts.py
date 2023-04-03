@@ -21,8 +21,8 @@ conn = sq3.connect('scripts.db')
 # Create a table to hold the image data
 conn.execute('''
     CREATE TABLE IF NOT EXISTS scripts
-    (id INTEGER PRIMARY KEY AUTOINCREMENT,
-     Option CHAR(25),
+    (id ,
+     
      Name CHAR(25),
      Text String (500));
 ''')
@@ -35,9 +35,9 @@ def deleteScript(Name):
     conn.commit()
 
 
-def databaseforscriptsinsert(Option, Name, Text):
+def databaseforscriptsinsert( Name, Text):
 
-    if Name == '' or Option == '':
+    if Name == '':
         messagebox.showerror("Error", "Name must be provided and Option selected")
 
     if Name == "default":
@@ -45,7 +45,7 @@ def databaseforscriptsinsert(Option, Name, Text):
     else:
         global idp
         cur = conn.cursor()
-        cur.execute("INSERT INTO Scripts (id, Option, Name, Text) VALUES (?,?,?,?)", (idp, Option, Name, Text))
+        cur.execute("INSERT INTO Scripts (id, Name, Text) VALUES (?,?,?)", (idp, Name, Text))
 
         # cur.execute("INSERT INTO Users (id, Name, Password) VALUES (?,?,?)", (id, Name, Password))
         idp +=1

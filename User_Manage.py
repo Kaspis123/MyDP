@@ -1,13 +1,9 @@
-import tkinter
+
 from tkinter import messagebox
 import tkinter as tk
-from PIL import ImageTk
 from tkinter import *
 from tkinter.ttk import *
-
-import Database_tasks
 import Database_teams
-import Database_users
 import InsideApp
 
 
@@ -83,7 +79,7 @@ def Managemet():
     def update_listbox():
         listbox.delete(0, tk.END)
         listbox.insert(0, 'ID   Name')
-        for row in Database_users.conn.execute('SELECT id, name FROM users'):
+        for row in Database_teams.conn.execute('SELECT id, name FROM members'):
             listbox.insert(tk.END, f'{row[0]:<3} {row[1]}')
 
     update_listbox()
@@ -96,15 +92,14 @@ def Managemet():
 
         x = Database_Add(hostname, password)
         if x != 0:
-            conn = Database_tasks.sqlite3.connect('teams.db')
-            c = conn.cursor()
+
+            c = Database_teams.conn.cursor()
             if len(team_dropdown) == 0:
                 team_dropdown = "Teamless"
             c.execute('SELECT team_id FROM Teams WHERE team_name=?', (team_dropdown,))
             team_id = c.fetchone()[0]
             c.execute('INSERT INTO Users (user_name, team_id) VALUES (?, ?)', (hostname, team_id))
-            conn.commit()
-            conn.close()
+
             update_listbox()
             new_window.destroy()
         else:
@@ -116,7 +111,7 @@ def Managemet():
 
         else:
             Database_teams.delete_user_from_team(Name)
-            Database_users.delete_user(Name)
+            Database_teams.delete_user(Name)
             update_listbox()
             new_window.destroy()
 
@@ -199,12 +194,12 @@ def Managemet():
             messagebox.showerror("Error", "Password must contain atleast 3 characters")
             return 0
         else:
-            Database_users.insert_user(User, Password)
+            Database_teams.insert_user(User, Password)
 
     def update_Listbox2(Name):
         listbox.delete(0, tk.END)
         listbox.insert(0, 'ID   Name')
-        cur = Database_users.conn.cursor()
+        cur = Database_teams.conn.cursor()
         cur.execute('SELECT id, name FROM users WHERE name=?', (Name,))
         rows = cur.fetchall()
         for row in rows:
@@ -323,7 +318,7 @@ def Managemet():
         name_label = tk.Label(new_window, text="Name:")
         name_label.grid(row=0, column=0, padx=10, pady=10)
 
-        names = Database_users.conn.execute("SELECT * FROM users").fetchall()
+        names = Database_teams.conn.execute("SELECT * FROM users").fetchall()
         list_names = [name[1] for name in names]
         list_dropdown = Combobox(new_window, values=list_names)
         list_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
@@ -350,12 +345,12 @@ def Managemet():
 def get_team_members(team_name):
 
     # Get the team_id of the selected team
-    c = Database_teams.conn.cursor()
+
     # c.execute("SELECT team_id FROM Teams WHERE team_name=456")
     # team_id = c.fetchone()[0]
     # print(team_id)
 
-    c.execute("SELECT team_id FROM Teams WHERE team_name=?",
+    c = Database_teams.conn.execute("SELECT team_id FROM Teams WHERE team_name=?",
               (team_name,))  # pass team_name as a tuple with str()
     team_id = c.fetchone()[0]
 

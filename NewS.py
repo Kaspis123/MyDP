@@ -1,13 +1,14 @@
 import io
 import tkinter as tk
-import tkinter.scrolledtext
+
 from tkinter import Canvas, messagebox
 from tkinter import *
 from tkinter.ttk import *
-from Tools.scripts.pindent import start
+
 import Change_Link
 import Database_scripts
-import Database_images
+
+import Database_teams
 import InsideApp
 import pyperclip
 from PIL import ImageTk, Image
@@ -20,44 +21,39 @@ resize_count = 0
 flag = True
 
 
-def button(T,name,option,window):
+def button(T,name,window):
     # T.delete("1.0", END)  # Clear the text from the input area
     # T.insert(INSERT,"Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
     global x
     global y
     global number
-    T.delete("1.0", END)  # Clear the text from the input area
-    T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
-    y+=1
+    global flag
+    flag = True
+    x-=1
+    y=+1
+    retrieve_input(T, name, window)
 
-
-
-def retrieve_input(T,name,option,window):
+def retrieve_input(T,name,window):
     global x
     global number
     global y
     global flag
-
-
-
     input = T.get("1.0", END)
     T.delete("1.0", END)  # Clear the text from the input area
-    Button(window, text="Stop this Branch", command=lambda : [button(T,name,option,window)]).grid(row=50, column=2, sticky=E)
-    if name == '' or option == None:
+    Button(window, text="Stop this Branch", command=lambda : [button(T,name,window)]).grid(row=50, column=2, sticky=E)
+    if name == '':
         x = 1
-        number = 0
+        number = 1
         window.destroy()
         NewS()
         messagebox.showerror("Error", "No data provided")
     else:
+        print(flag)
         if flag:
             T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
             y += 1
-            print(y)
-            print("zadava se negativni")
         else:
             T.insert(INSERT, "Zadejte text při pozitivní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
-            print("zadava se pozitivni")
             x += 1
         if y > x:
             flag = False
@@ -65,11 +61,11 @@ def retrieve_input(T,name,option,window):
         else:
             flag = True
             number += 1
-            print("Změna number z ", number - 1,  "Na number", number)
     return input
 
 
 def NewS():
+
     window = tk.Tk()  # vytvořeni objektu
     window.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
     window.title("New Script")  # Pojmenování aplikace
@@ -84,34 +80,34 @@ def NewS():
     hostname_search_entry = Entry(frame_search, textvariable=hostname_search)
     hostname_search_entry.grid(row=1, column=3)
 
-    var1 = tk.IntVar()
-    var2 = tk.IntVar()
+    # var1 = tk.IntVar()
+    # var2 = tk.IntVar()
 
-    c1 = tk.Checkbutton(window, variable=var1, text='Phishing', onvalue=1, offvalue=0)
-    c1.grid(row=11, column=2, padx=(10, 0), pady=0)
-
-    c2 = tk.Checkbutton(window, variable=var2, text='Vishing  ', onvalue=1, offvalue=0)
-    c2.grid(row=12, column=2, padx=(10, 0), pady=0)
+    # c1 = tk.Checkbutton(window, variable=var1, text='Phishing', onvalue=1, offvalue=0)
+    # c1.grid(row=11, column=2, padx=(10, 0), pady=0)
+    #
+    # c2 = tk.Checkbutton(window, variable=var2, text='Vishing  ', onvalue=1, offvalue=0)
+    # c2.grid(row=12, column=2, padx=(10, 0), pady=0)
     image = PhotoImage(file="arrow.jpg")
     btn = Button(window, image=image, command=lambda: [window.destroy(), Back()])
     btn.image = image
     btn.grid(row=0, column=0)
 
-    def print_selection():
-        if (var1.get() == 1) & (var2.get() == 0):
-            return 1
-        elif (var1.get() == 0) & (var2.get() == 1):
-            return 0
-        elif (var1.get() == 0) & (var2.get() == 0):
-            messagebox.showerror("Error", "Atleast one must be chosen")
-        else:
-            messagebox.showerror("Error", "Cant use both")
+    # def print_selection():
+    #     if (var1.get() == 1) & (var2.get() == 0):
+    #         return 1
+    #     elif (var1.get() == 0) & (var2.get() == 1):
+    #         return 0
+    #     elif (var1.get() == 0) & (var2.get() == 0):
+    #         messagebox.showerror("Error", "Atleast one must be chosen")
+    #     else:
+    #         messagebox.showerror("Error", "Cant use both")
 
     T = tk.Text(window, height=10, width=40)
     T.grid(row=10, column=3, rowspan=35, padx=10, pady=10, sticky="NSEW")
     T.insert(tk.INSERT, "Úvodní věta")
     # Create button for next text.
-    b1 = Button(window, text="Next and Save", command= lambda: [Database_scripts.databaseforscriptsinsert(print_selection(), hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(),print_selection(), window)])
+    b1 = Button(window, text="Next and Save", command= lambda: [Database_scripts.databaseforscriptsinsert(hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(), window)])
 
     # b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)),retrieve_input(T,hostname_search_entry.get())])
     b1.grid(row=50, column=3, sticky=E)
@@ -124,7 +120,7 @@ def NewS():
 
 
     # Create a button to open the file dialog
-    button = Button(window, text="Select Image", command=lambda : [Database_images.insert_image(hostname_search.get()),update_listbox()])
+    button = Button(window, text="Select Image", command=lambda : [Database_teams.insert_image(hostname_search.get()),update_listbox()])
     button.grid(row = 72, column= 3)
 
 
@@ -134,7 +130,7 @@ def NewS():
         if selection:
             index = selection[0]
             item = event.widget.get(index)
-            image_data = Database_images.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
+            image_data = Database_teams.conn.execute('SELECT data FROM images WHERE name=?', (item,)).fetchone()[0]
 
             # Load the image data into a PIL Image object
             pil_image = Image.open(io.BytesIO(image_data))
@@ -191,7 +187,7 @@ def NewS():
 
             # Create a popup menu with the option to delete the selected image
             popup_menu = Menu(window, tearoff=0)
-            popup_menu.add_command(label="Delete", command=lambda :[Database_images.delete_image_from_db(selected_item), update_listbox()])
+            popup_menu.add_command(label="Delete", command=lambda :[Database_teams.delete_image_from_db(selected_item), update_listbox()])
             popup_menu.add_command(label="Show", command=lambda event=event: [display_image(event), update_listbox()])
 
             # Display the popup menu at the mouse position
@@ -206,7 +202,7 @@ def NewS():
         listbox.delete(0, END)
 
         # Insert the current image names from the database into the listbox
-        for row in Database_images.conn.execute('SELECT name FROM images'):
+        for row in Database_teams.conn.execute('SELECT name FROM images'):
             listbox.insert(END, row[0])
 
     listbox = Listbox(window)

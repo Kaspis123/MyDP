@@ -2,6 +2,7 @@ import tkinter
 from tkinter import messagebox
 
 import Database_tasks
+import Database_teams
 import Running
 import NewQ
 import Done
@@ -44,7 +45,7 @@ def set_name(name1):
     name = name1
 
 def popup():
-     d = Database_tasks.get_new_tasks(name)
+     d = Database_teams.get_new_tasks(name)
      if d > 0:
          messagebox.showinfo("Update", "You have" + " " +str(d) + " " +  "new tasks")
 
