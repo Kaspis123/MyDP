@@ -7,7 +7,11 @@ import Database_teams
 import InsideApp
 from PIL import ImageTk, Image
 number = 1
+i=1
 resize_count = 0
+s=1
+visited_ids = []
+
 def Test():
     global number
     window = tk.Tk()  # vytvořeni objektu
@@ -49,7 +53,7 @@ def Test():
         x = Database_scripts.databaseforscriptsread(name,number)
         T.insert(INSERT, x)
         btn3 = tk.Button(window,text='Back',fg='black', command= lambda: [backbutton(T, name)]).grid(row=6,column=6)
-        btn1 = tk.Button(window, text="Pozitivni", fg="green",command=lambda: [update(T,name)]).grid(row= 7, column=4)
+        btn1 = tk.Button(window, text="Pozitivni", fg="green",command=lambda: [increment_number(T,name)]).grid(row= 7, column=4)
         btn2 = tk.Button(window, text="Negativni", fg="blue",command= lambda: [update2(T,name)]).grid(row=7, column=5)
 
 
@@ -76,7 +80,7 @@ def Test():
             x = Database_scripts.databaseforscriptsread(item, number)
             T.insert(INSERT, x)
             btn3 = tk.Button(new_window, text='Back', fg='black', command=lambda: [backbutton(T, item)]).grid(row=7,column=1)
-            btn1 = tk.Button(new_window, text="Pozitivni", fg="green", command=lambda: [update(T, item)]).grid(row=7,column=3)
+            btn1 = tk.Button(new_window, text="Pozitivni", fg="green", command=lambda: [increment_number(T, item)]).grid(row=7,column=3)
             btn2 = tk.Button(new_window, text="Negativni", fg="blue", command=lambda: [update2(T, item)]).grid(row=7,column=4)
             open_new_window_image(item)
     def open_new_window_image(skript):
@@ -216,18 +220,60 @@ def Test():
 
 
     def backbutton(T,name):
+        global s, number
+        global visited_ids
+        # check if there is a previous node
+        # if s is not None:
+        #     # query the database for the previous node
+        #     x = Database_scripts.conn.execute("SELECT parent_id,left,right FROM Scripts WHERE id = ?", (number,))
+        #
+        #     # fetch the row and update the variables
+        #     row = x.fetchone()
+        #     if row is not None:
+        #         data = row[0]
+        #         data1 = row[1]
+        #         data2 = row[2]
+        #         print(data1, data2)
+        #         p =  Database_scripts.conn.execute("SELECT Text, id FROM Scripts WHERE Name = ? AND id = ?", (name, data,))
+        #         h = p.fetchone()[0]
+        #         T.delete("1.0", END)
+        #         T.insert(INSERT, h)
+        #         # if data1 == None:
+        #         print("changed")
+        #         number = data
+        #         s = data
+                #     print(number)
+                # else:
+                #     print("changed")
+                #     s=data
+                #     print(s)
+        prev_id = visited_ids[-2]
+        x = Database_scripts.conn.execute("SELECT Text, id, parent_id,left FROM Scripts WHERE id = ?", (prev_id,))
+        row = x.fetchone()
+
+        data = row[0]
+        dat2 = row[1]
+        daata = row[2]
+        dd = row[3]
+        print(dd)
+        T.delete("1.0", END)
+        T.insert(INSERT, data)
+
+
+        # update the global variables
         global number
-        if (number % 2) == 1:
-            number -= 1
-            number = number / 2
-            T.delete("1.0", END)
-            x = Database_scripts.databaseforscriptsread(name, number)
-            T.insert(INSERT, x)
+        global s
+        if dd == "negative":
+            number = dat2
         else:
-            number = number / 2
-            T.delete("1.0", END)
-            x = Database_scripts.databaseforscriptsread(name, number)
-            T.insert(INSERT, x)
+            s = daata
+
+        print("Moved back to node with ID:", daata)
+        visited_ids.pop()
+
+
+
+
 
 
 
@@ -236,29 +282,45 @@ def Test():
         update_listbox()
 
 
-    def update(T,name):
-        global number
-        if number >= 3:
-            number = (number * 2) + 1
-        else:
-            number += 2
+
+def increment_number(T, name):
+    global number  # use global keyword to access and update the global variable
+    global s  # use global keyword to access and update the global variable
+    global visited_ids
+    # print(s)
+    x = Database_scripts.conn.execute("SELECT Text, id FROM Scripts WHERE Name = ? AND right = ? AND parent_id = ?", (name, "positive", s))
+    row = x.fetchone()
+    if row is not None:
+        data = row[0]
+        dat2 = row[1]
+        print(dat2)
+        number = dat2
+        s = dat2
+        visited_ids.append(dat2)
+        T.delete("1.0", END)
+        T.insert(INSERT, data)
+
+def update2(T, name):
+    global number
+    x = Database_scripts.conn.execute("SELECT Text, id FROM Scripts WHERE Name = ? AND left = ? AND parent_id = ?",
+                                      (name, "negative", number))
+    row = x.fetchone()
+    if row is not None:
+        data = row[0]
+        print(data)
+        dat2 = row[1]
+        print(dat2)
+        number = dat2
+        visited_ids.append(dat2)
         x = Database_scripts.databaseforscriptsread(name, number)
         T.delete("1.0", END)
         T.insert(INSERT, x)
 
-    def update2(T,name):
-        global number
-        if number >= 2:
-            number = (number * 2)
-        else:
-            number +=1
-        x = Database_scripts.databaseforscriptsread(name,number)
-        T.delete("1.0", END)
-        T.insert(INSERT, x)
 
-
-    def Back():
-        global number
-        number = 1
-        InsideApp.InsideApp()
+def Back():
+    global number
+    global s
+    number = 1
+    s = 1
+    InsideApp.InsideApp()
 

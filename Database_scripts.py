@@ -6,6 +6,8 @@ from PIL import Image, ImageTk
 
 import User_Manage
 idp = 1
+value = True
+rodic = 1
 # def databaseforscripts():
 #     con = sq3.connect("scripts.db")
 #     cur = con.cursor()
@@ -21,10 +23,13 @@ conn = sq3.connect('scripts.db')
 # Create a table to hold the image data
 conn.execute('''
     CREATE TABLE IF NOT EXISTS scripts
-    (id ,
-     
+    (id INT ,
      Name CHAR(25),
-     Text String (500));
+     Text String (1000),
+     left String,
+     right String,
+     parent_id INT);
+     
 ''')
 conn.commit()
 
@@ -35,21 +40,31 @@ def deleteScript(Name):
     conn.commit()
 
 
-def databaseforscriptsinsert( Name, Text):
+def databaseforscriptsinsert(Name, Text):
 
-    if Name == '':
-        messagebox.showerror("Error", "Name must be provided and Option selected")
-
-    if Name == "default":
-        messagebox.showerror("Error", "Name 'default' is reserved")
+    cur = conn.cursor()
+    global idp
+    negative = "negative"
+    positive = "positive"
+    # if Name == '':
+    #     messagebox.showerror("Error", "Name must be provided and Option selected")
+    #
+    # if Name == "default":
+    #     messagebox.showerror("Error", "Name 'default' is reserved")
+    if idp == 1:
+        cur.execute("INSERT INTO Scripts (id, Name, Text) VALUES (?,?,?)",
+                    (idp, Name, Text,))
+        idp+=1
+    elif value == True:
+        cur.execute("INSERT INTO Scripts (id, Name, Text, left, parent_id) VALUES (?,?,?,?,?)", (idp, Name, Text,negative,rodic))
+        print("Zadává se negativní věta, která má rodiče" + str(rodic))
+        idp +=1
     else:
-        global idp
-        cur = conn.cursor()
-        cur.execute("INSERT INTO Scripts (id, Name, Text) VALUES (?,?,?)", (idp, Name, Text))
-
+        cur.execute("INSERT INTO Scripts (id, Name, Text,right, parent_id) VALUES (?,?,?,?,?)", (idp, Name, Text,positive,rodic))
+        print("Zadává se pozitivní věta, která má rodiče" + str(rodic))
         # cur.execute("INSERT INTO Users (id, Name, Password) VALUES (?,?,?)", (id, Name, Password))
         idp +=1
-        conn.commit()
+    conn.commit()
 def databaseforscriptsread(Name, number):
     try:
         cur = conn.cursor()
@@ -71,10 +86,20 @@ def fetchscript( hostname=''):
     print (m)
     return m
 
+def increate_idp():
+    global idp
+    idp+=1
+    return idp
 
 
 
+def set_flag(flag):
+    global value
+    value = flag
 
+def set_number(parent):
+    global rodic
+    rodic = parent
 
 
 

@@ -31,6 +31,7 @@ def button(T,name,window):
     flag = True
     x-=1
     y=+1
+    # Database_scripts.increate_idp()
     retrieve_input(T, name, window)
 
 def retrieve_input(T,name,window):
@@ -38,6 +39,8 @@ def retrieve_input(T,name,window):
     global number
     global y
     global flag
+    Database_scripts.set_number(number)
+    Database_scripts.set_flag(flag)
     input = T.get("1.0", END)
     T.delete("1.0", END)  # Clear the text from the input area
     Button(window, text="Stop this Branch", command=lambda : [button(T,name,window)]).grid(row=50, column=2, sticky=E)
@@ -48,7 +51,6 @@ def retrieve_input(T,name,window):
         NewS()
         messagebox.showerror("Error", "No data provided")
     else:
-        print(flag)
         if flag:
             T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
             y += 1
