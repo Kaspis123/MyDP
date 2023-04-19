@@ -1,8 +1,8 @@
 import tkinter
+
+
 import InsideApp
 from PIL import ImageTk
-
-
 
 window = tkinter.Tk()  # Zmena názvu Aplikace
 window.minsize(width=500, height=500)  # Nastavení velikosti okna aplikace

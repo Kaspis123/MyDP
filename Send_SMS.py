@@ -7,7 +7,7 @@ def send():
 
   responseData = sms.send_message(
     {
-      "from": "Vonage APIs",
+      "from": "Jan Kašpar",
       "to": "420737887369",
       "text": "test",
     }

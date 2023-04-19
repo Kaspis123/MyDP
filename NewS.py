@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import Canvas, messagebox
 from tkinter import *
 from tkinter.ttk import *
+import customtkinter
 
 import Change_Link
 import Database_scripts
@@ -12,18 +13,17 @@ import Database_teams
 import InsideApp
 import pyperclip
 from PIL import ImageTk, Image
+import tkinter.font as tkfont
 
 
-x = 1
+x = 0
 number = 1
 y = 1
 resize_count = 0
 flag = True
 
 
-def button(T,name,window):
-    # T.delete("1.0", END)  # Clear the text from the input area
-    # T.insert(INSERT,"Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
+def button(T, name, window):
     global x
     global y
     global number
@@ -31,7 +31,6 @@ def button(T,name,window):
     flag = True
     x-=1
     y=+1
-    # Database_scripts.increate_idp()
     retrieve_input(T, name, window)
 
 def retrieve_input(T,name,window):
@@ -43,7 +42,7 @@ def retrieve_input(T,name,window):
     Database_scripts.set_flag(flag)
     input = T.get("1.0", END)
     T.delete("1.0", END)  # Clear the text from the input area
-    Button(window, text="Stop this Branch", command=lambda : [button(T,name,window)]).grid(row=50, column=2, sticky=E)
+
     if name == '':
         x = 1
         number = 1
@@ -65,65 +64,82 @@ def retrieve_input(T,name,window):
             number += 1
     return input
 
+def retrieve(T,name,window):
+    input = T.get("1.0", END)
+    T.delete("1.0", END)
+    global x
+    global number
+    x += 1
+
+    if (x % 2) == 1:
+        T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_teams.databaseforscriptsread(name,number))
+        return input
+    else:
+        T.insert(INSERT, "Zadejte text při pozitivní odpovědi" + Database_teams.databaseforscriptsread(name,number))
+        number += 1
+        return input
+
 
 def NewS():
-
-    window = tk.Tk()  # vytvořeni objektu
-    window.minsize(width=800, height=800)  # Nastavení velikosti okna aplikace
+    customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
+    window = customtkinter.CTk()  # vytvořeni objektu
+    window.minsize(width=500, height=500)  # Nastavení velikosti okna aplikace
     window.title("New Script")  # Pojmenování aplikace
+    # window.iconbitmap("icon.ico")  # Set the window icon
 
-    frame_search = Frame(window)
-    frame_search.grid(row=1, column=3)
+    # Define the frames
+    frame_search = customtkinter.CTkFrame(window)
+    frame_search.grid(row=1, column=3, padx=10, pady=10)
 
-    lbl_search = Label(frame_search, text='Name of the new Script', font=('bold', 12))
-    lbl_search.grid(row=1, column=1, sticky=tk.W)
+    # Define the widgets
+    lbl_search = customtkinter.CTkLabel(frame_search, text='Name of the new Script',width=120,
+                               font=customtkinter.CTkFont(size=15, weight="bold"), corner_radius= 5)
+    lbl_search.grid(row=1, column=1, sticky=tk.W, padx=10, pady=10)
 
     hostname_search = StringVar()
-    hostname_search_entry = Entry(frame_search, textvariable=hostname_search)
-    hostname_search_entry.grid(row=1, column=3)
+    hostname_search_entry = customtkinter.CTkEntry(frame_search, textvariable=hostname_search, width=120,
+                               height=25,
+                               border_width=2,
+                               corner_radius=5)
+    hostname_search_entry.grid(row=1, column=3, padx=10, pady=10)
 
-    # var1 = tk.IntVar()
-    # var2 = tk.IntVar()
+    # image = PhotoImage(file="arrow.jpg")
+    my_image = customtkinter.CTkImage(light_image=Image.open("arrow.jpg"))
+    btn = customtkinter.CTkButton(window, text= "", width=10, image=my_image, hover=True,  command=lambda: buttonfunctions(window))
+    btn.grid(row=0, column=0, padx=10, pady=10)
 
-    # c1 = tk.Checkbutton(window, variable=var1, text='Phishing', onvalue=1, offvalue=0)
-    # c1.grid(row=11, column=2, padx=(10, 0), pady=0)
-    #
-    # c2 = tk.Checkbutton(window, variable=var2, text='Vishing  ', onvalue=1, offvalue=0)
-    # c2.grid(row=12, column=2, padx=(10, 0), pady=0)
-    image = PhotoImage(file="arrow.jpg")
-    btn = Button(window, image=image, command=lambda: [window.destroy(), Back()])
-    btn.image = image
-    btn.grid(row=0, column=0)
-
-    # def print_selection():
-    #     if (var1.get() == 1) & (var2.get() == 0):
-    #         return 1
-    #     elif (var1.get() == 0) & (var2.get() == 1):
-    #         return 0
-    #     elif (var1.get() == 0) & (var2.get() == 0):
-    #         messagebox.showerror("Error", "Atleast one must be chosen")
-    #     else:
-    #         messagebox.showerror("Error", "Cant use both")
-
-    T = tk.Text(window, height=10, width=40)
-    T.grid(row=10, column=3, rowspan=35, padx=10, pady=10, sticky="NSEW")
+    T = customtkinter.CTkTextbox(window, height=80, width=40)
+    T.grid(row=10, column=3, padx=10, pady=10, sticky="NSEW")
     T.insert(tk.INSERT, "Úvodní věta")
-    # Create button for next text.
-    b1 = Button(window, text="Next and Save", command= lambda: [Database_scripts.databaseforscriptsinsert(hostname_search.get(), T.get("1.0", END)), retrieve_input(T,hostname_search_entry.get(), window)])
-
-    # b1 = Button(window, text="Next", command=lambda: [DatabaseForScripts.Datafromscripts(hostname_search.get(), print_selection(), T.get("1.0", END)),retrieve_input(T,hostname_search_entry.get())])
-    b1.grid(row=50, column=3, sticky=E)
-
-    bitly_var = StringVar()
-    bitly = Entry(window, textvariable=bitly_var)
-    bitly.grid(row=70, column=3, sticky=E)
-    Button(window, text="Get Short URL", command=lambda: [Changelink(bitly.get(),bitly_var)]).grid(row=71, column=3)
 
 
+    b1 = customtkinter.CTkButton(window, text="Next and Save",width=100,
+                                 height=32,
+                                 border_width=0,
+                                 corner_radius=8, command=lambda: b1functions(hostname_search.get(),T,window))
+    b1.grid(row=50, column=3, sticky=tk.E, padx=10, pady=10)
+    stop_button = customtkinter.CTkButton(window,width=100,
+                                 height=32,
+                                 border_width=0,
+                                 corner_radius=8, text="Stop this Branch", command=lambda: button(T, hostname_search.get(), window))
+    stop_button.grid(row=50, column=3, pady=10, padx=10, sticky=tk.W)
 
-    # Create a button to open the file dialog
-    button = Button(window, text="Select Image", command=lambda : [Database_teams.insert_image(hostname_search.get()),update_listbox()])
-    button.grid(row = 72, column= 3)
+    window.eval('tk::PlaceWindow %s center' % window.winfo_toplevel())
+
+
+
+    # bitly_var = StringVar()
+    # bitly = Entry(window, textvariable=bitly_var)
+    # bitly.grid(row=70, column=3, sticky=E)
+    # Button(window, text="Get Short URL", command=lambda: [Changelink(bitly.get(),bitly_var)]).grid(row=71, column=3)
+    #
+    # # Create a button to open the file dialog
+    button_image = customtkinter.CTkButton(window, text="Select Image",width=100,
+                                 height=32,
+                                 border_width=0,
+                                 corner_radius=8, command=lambda : buttonimagefunctions(hostname_search.get()))
+    button_image.grid(row = 50, column= 3)
 
 
     def display_image(event):
@@ -208,10 +224,13 @@ def NewS():
             listbox.insert(END, row[0])
 
     listbox = Listbox(window)
-    update_listbox()
-    listbox.grid(row=75, column=3)
-    listbox.bind('<Double-1>', display_image)
-    listbox.bind("<Button-3>", delete_image)
+    # update_listbox()
+    # listbox.grid(row=75, column=3)
+    # listbox.bind('<Double-1>', display_image)
+    # listbox.bind("<Button-3>", delete_image)
+    # messagebox.showinfo("Information", "Prosím dodržujte právní zásady, viz zádání úkolu.")
+
+
 
     window.mainloop()
 
@@ -235,6 +254,22 @@ def Back():
     global flag
     flag = True
     InsideApp.InsideApp()
+
+# def b1functions(name ,T, window):
+#     Database_scripts.databaseforscriptsinsert(name,  T.get("1.0", END))
+#     retrieve_input(T, name, window)
+
+def b1functions(name ,T, window):
+    Database_teams.databaseforscriptsinsert(name,T.get("1.0", END))
+    retrieve(T,name,window)
+
+def buttonimagefunctions(name):
+    Database_teams.insert_image(name)
+def buttonfunctions(window):
+    window.destroy()
+    Back()
+
+
 
 
 

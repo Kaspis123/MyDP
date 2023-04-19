@@ -5,12 +5,16 @@ from tkinter import *
 from tkinter.ttk import *
 import Database_teams
 import InsideApp
-
+import requests
+import json
 
 def Managemet():
     window = tk.Tk()
     window.title("Management")
     window.geometry("700x500")
+
+
+
 
     # Create an image button
     image = tk.PhotoImage(file="arrow.jpg")
@@ -357,5 +361,6 @@ def get_team_members(team_name):
     # Get the members of the team from the database
     c.execute("SELECT user_name FROM Users WHERE team_id=?", (team_id,))
     members = c.fetchall()
+    print(members)
 
     return members

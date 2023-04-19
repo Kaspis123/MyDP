@@ -4,6 +4,8 @@ from tkinter import messagebox, filedialog
 import Database_users
 import NewQ
 from User_Manage import get_team_members
+idp= 0
+
 
 conn = sq3.connect('teams.db')
 c = conn.cursor()
@@ -23,6 +25,15 @@ c.execute('''CREATE TABLE IF NOT EXISTS Users
 c.execute('''CREATE TABLE IF NOT EXISTS tasks
                  (name text, description text, creation_date text, due_date text, employee text, viewed bool, pdf text)''')
 
+c.execute('''CREATE TABLE IF NOT EXISTS subtasks
+             (id integer PRIMARY KEY,
+              task_name text,
+              var1 text,
+              var2 text,
+              var3 text,
+              var4 text,
+              FOREIGN KEY(task_name) REFERENCES tasks(name))''')
+
 c.execute('''
     CREATE TABLE IF NOT EXISTS members
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,6 +50,7 @@ c.execute('''
 ''')
 
 c.execute("CREATE TABLE IF NOT EXISTS tree (id INTEGER PRIMARY KEY, parent_id INTEGER, name TEXT, value INTEGER)")
+c.execute("CREATE TABLE IF NOT EXISTS skripty (id INTEGER PRIMARY KEY, idp INTEGER, name TEXT,text TEXT)")
 
 def insert_team(team_name):
     c.execute("INSERT INTO Teams (team_name) VALUES (?)", (team_name,))
@@ -224,3 +236,38 @@ def insert_node_to_database(parent_id, name, value):
 
 def get_node_from_database(value):
     c.execute("SELECT name FROM tree WHERE value=? ", (value))
+
+def databaseforscriptsinsert(Name,Text):
+
+    global idp
+    cur = conn.cursor()
+    if Name == '':
+        print ("nope")
+    else:
+        idp += 1
+        cur.execute("INSERT INTO skripty ( Name, idp, Text) VALUES (?,?,?)", (Name, idp, Text))
+
+    conn.commit()
+
+
+def databaseforscriptsread(Name, number):
+    print(number)
+    cur = conn.cursor()
+    # cur.execute("SELECT ? FROM Data where ?=?", (column, goal, constrain,))
+    cur.execute("Select Text FROM skripty WHERE Name = ? and  idp = ?", [Name, number])
+    data = cur.fetchone()[0]
+    return str(data)
+
+
+def smlouvainsert(name,var1,var2,var3,var4):
+    cur=conn.cursor()
+
+    cur.execute('''INSERT INTO subtasks (task_name, var1, var2, var3, var4) VALUES (?, ?, ?, ?, ?)''', (name, var1, var2, var3, var4))
+    conn.commit()
+
+def smlouvaread(name):
+    cur = conn.cursor()
+    cur.execute('''SELECT * FROM subtasks WHERE task_name = ?''', (str(name),))
+    rows = cur.fetchall()
+    return rows
+

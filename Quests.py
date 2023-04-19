@@ -9,25 +9,25 @@ from tkPDFViewer import tkPDFViewer as pdf
 
 import Database_teams
 import Finished_Tasks
-
+import customtkinter
 
 def show(name1):
     # Create the tasks window
     RED = "#FF3333"
     ORANGE = "#FFA500"
     GREEN = "#33FF33"
-    tasks_window = Tk()
+    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
+    tasks_window = customtkinter.CTk()
     tasks_window.title("My Tasks")
 
-    # Create the tasks label
-    tasks_label = Label(tasks_window, text="My Tasks", font=("Arial", 24, "bold"), fg="#333333", bg="#f2f2f2", padx=20, pady=20)
-    tasks_label.pack(padx=10, pady=10)
+
 
     # Create the tasks listbox
     tasks_listbox = Listbox(tasks_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff", selectbackground="#cccccc", highlightthickness=0,justify="center")
     tasks_listbox.pack(padx=10, pady=10)
 
-    close_button = Button(tasks_window, text="Close", command=tasks_window.destroy)
+    close_button = customtkinter.CTkButton(tasks_window, text="Close", command=lambda: tasks_window.destroy())
     close_button.pack(padx=10, pady=10)
 
     def getlistbox():
@@ -96,23 +96,24 @@ def open_task_window(task_name):
     c.execute("SELECT * FROM tasks WHERE name=?", (task_name,))
     task = c.fetchone()
     c.close()
-
+    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
     # Create the main window
-    window = Tk()
+    window = customtkinter.CTk()
     window.title("View Task")
 
     # Create the task name label and entry field
-    name_label = Label(window, text="Task Name:")
+    name_label = customtkinter.CTkLabel(window, text="Task Name:")
     name_label.grid(row=0, column=0, padx=5, pady=5, sticky=W)
-    name_entry = Entry(window)
+    name_entry = customtkinter.CTkEntry(window)
     name_entry.insert(0, task[0])
     name_entry.configure(state="readonly")
     name_entry.grid(row=0, column=1, padx=5, pady=5, sticky=W)
 
     # Create the task description label and text field
-    description_label = Label(window, text="Task Description:")
+    description_label = customtkinter.CTkLabel(window, text="Task Description:")
     description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-    description_entry = Text(window, height=5, width=30)
+    description_entry = customtkinter.CTkTextbox(window, height=20, width=140)
     description_entry.insert(END, task[1])
     description_entry.configure(state="disabled")
     description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
@@ -126,7 +127,7 @@ def open_task_window(task_name):
     # creation_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky=W)
 
     # Create the task due date label and date entry field
-    due_date_label = Label(window, text="Task Due Date:")
+    due_date_label = customtkinter.CTkLabel(window, text="Task Due Date:")
     due_date_label.grid(row=2, column=0, padx=5, pady=5, sticky=W)
 
     due_date_str = task[3]
@@ -138,7 +139,7 @@ def open_task_window(task_name):
     due_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky=W)
 
     days_remaining = (due_date - date.today()).days
-    day_label = Label(window, text="Days to finish: " + str(days_remaining))
+    day_label = customtkinter.CTkLabel(window, text="Days to finish: " + str(days_remaining))
     day_label.grid(row=3, column=1, padx=5, pady=5, sticky=W)
 
     # Create the task employee label and entry field
@@ -150,24 +151,55 @@ def open_task_window(task_name):
     # employee_entry.grid(row=3, column=1, padx=5, pady=5, sticky=W)
     if task[6] != '':
 
-        pdf_label = Label(window, text="PDF:")
+        pdf_label = customtkinter.CTkLabel(window, text="PDF:")
         pdf_label.grid(row=4, column=0, padx=5, pady=5, sticky=W)
-        pdf_entry = Entry(window)
+        pdf_entry = customtkinter.CTkEntry(window,height=30, width=80)
 
         pdf_entry.insert(END, task[6])
         pdf_entry.configure(state="readonly")
         pdf_entry.grid(row=4, column=1, padx=5, pady=5, sticky=W)
 
         # Create the close button
-        open_button = Button(window,text="Open", command=lambda: [show_pdf_file(pdf_entry.get())])
+        open_button = customtkinter.CTkButton(window,text="Open",height=30, width=80, command=lambda: show_pdf_file(pdf_entry.get()))
         open_button.grid(row=4, column=1, padx=(88, 0))
-    close_button = Button(window, text="Close", command=window.destroy)
-    close_button.grid(row=3, column=1, padx=5, pady=5, sticky=E)
+    close_button = customtkinter.CTkButton(window, text="Close", command=lambda: window.destroy())
+    close_button.grid(row=5, column=1, padx=(5, 88), pady=5, )
 
-    # Make the window modal
-    window.focus_set()
-    window.grab_set()
-    window.wait_window()
+    def displayrows():
+        rows = Database_teams.smlouvaread(task[0])
+        print(rows)
+
+        for row in rows:
+            if row[2] !=" ":
+                t.insert('end', str(row[2]) + '\n\n')
+            if row[3] !=" ":
+                t.insert('end', str(row[3]) + '\n\n')
+            if row[4] !=" ":
+                t.insert('end', str(row[4]) + '\n\n')
+            if row[5] !=" ":
+                t.insert('end', str(row[5]) + '\n\n')
+
+    windowsmlouva = customtkinter.CTkToplevel(window)
+    windowsmlouva.title("Smlouva")
+    window_width = 420
+    window_height = 350
+    screen_width = windowsmlouva.winfo_screenwidth()
+    screen_height = windowsmlouva.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2) + 60)
+    y = int((screen_height / 2) - (window_height / 2) + 60)
+    windowsmlouva.geometry(f"{window_width}x{window_height}+{z}+{y}")
+
+    t = customtkinter.CTkTextbox(windowsmlouva,width=420,height=350)
+    t.pack()
+
+    displayrows()
+
+    window.mainloop()
+
+
+
+
+
 
 def show_pdf_file(entry):
     new_window = Toplevel()
