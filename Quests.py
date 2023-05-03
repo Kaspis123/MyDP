@@ -16,7 +16,7 @@ def show(name1):
     RED = "#FF3333"
     ORANGE = "#FFA500"
     GREEN = "#33FF33"
-    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
     customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
     tasks_window = customtkinter.CTk()
     tasks_window.title("My Tasks")
@@ -96,11 +96,18 @@ def open_task_window(task_name):
     c.execute("SELECT * FROM tasks WHERE name=?", (task_name,))
     task = c.fetchone()
     c.close()
-    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
     customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
     # Create the main window
     window = customtkinter.CTk()
     window.title("View Task")
+    window_width = 400
+    window_height = 280
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    window.geometry(f"{window_width}x{window_height}+{z}+{y}")
 
     # Create the task name label and entry field
     name_label = customtkinter.CTkLabel(window, text="Task Name:")
@@ -113,7 +120,7 @@ def open_task_window(task_name):
     # Create the task description label and text field
     description_label = customtkinter.CTkLabel(window, text="Task Description:")
     description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-    description_entry = customtkinter.CTkTextbox(window, height=20, width=140)
+    description_entry = customtkinter.CTkTextbox(window, height=80, width=140)
     description_entry.insert(END, task[1])
     description_entry.configure(state="disabled")
     description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
@@ -167,10 +174,10 @@ def open_task_window(task_name):
 
     def displayrows():
         rows = Database_teams.smlouvaread(task[0])
-        print(rows)
 
         for row in rows:
             if row[2] !=" ":
+                print("vklada")
                 t.insert('end', str(row[2]) + '\n\n')
             if row[3] !=" ":
                 t.insert('end', str(row[3]) + '\n\n')
@@ -179,18 +186,20 @@ def open_task_window(task_name):
             if row[5] !=" ":
                 t.insert('end', str(row[5]) + '\n\n')
 
-    windowsmlouva = customtkinter.CTkToplevel(window)
-    windowsmlouva.title("Smlouva")
-    window_width = 420
-    window_height = 350
-    screen_width = windowsmlouva.winfo_screenwidth()
-    screen_height = windowsmlouva.winfo_screenheight()
-    z = int((screen_width / 2) - (window_width / 2) + 60)
-    y = int((screen_height / 2) - (window_height / 2) + 60)
-    windowsmlouva.geometry(f"{window_width}x{window_height}+{z}+{y}")
+    rows = Database_teams.smlouvaread2(task[0])
+    if rows != [(' ', ' ', ' ', ' ')]:
+        windowsmlouva = customtkinter.CTkToplevel(window)
+        windowsmlouva.title("Smlouva")
+        window_width = 420
+        window_height = 350
+        screen_width = windowsmlouva.winfo_screenwidth()
+        screen_height = windowsmlouva.winfo_screenheight()
+        z = int((screen_width / 2) - (window_width / 2) + 60)
+        y = int((screen_height / 2) - (window_height / 2) + 60)
+        windowsmlouva.geometry(f"{window_width}x{window_height}+{z}+{y}")
 
-    t = customtkinter.CTkTextbox(windowsmlouva,width=420,height=350)
-    t.pack()
+        t = customtkinter.CTkTextbox(windowsmlouva,width=420,height=350)
+        t.pack()
 
     displayrows()
 

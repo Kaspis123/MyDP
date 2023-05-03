@@ -1,7 +1,6 @@
-import Database_tasks
+
 from tkinter import *
-from tkinter import ttk
-import sqlite3
+
 from datetime import datetime
 from tkcalendar import DateEntry
 from datetime import date
@@ -9,80 +8,95 @@ from datetime import date
 import Database_teams
 from Quests import show, show_pdf_file
 import customtkinter
+from tkinter import ttk
 
 
 def Running():
     # Create the tasks window
-    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
     customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
-    RED = "#FF3333"
-    ORANGE = "#FFA500"
-    GREEN = "#33FF33"
+
     running_tasks_window= customtkinter.CTk()
     running_tasks_window.title("Currently Running Tasks")
+    window_width = 400
+    window_height = 280
+    screen_width = running_tasks_window.winfo_screenwidth()
+    screen_height = running_tasks_window.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    running_tasks_window.geometry(f"{window_width}x{window_height}+{z}+{y}")
 
-    # Create the tasks label
-    # tasks_label = customtkinter.CTkLabel(running_tasks_window, text="Currently Running Tasks", width=300,
-    #                            height=50,
-    #                            fg_color=("white", "gray75"),
-    #                            corner_radius=8, padx=20,
-    #                     pady=20)
-    # tasks_label.pack(padx=10, pady=10)
-    scrollbar = Scrollbar(running_tasks_window, orient="vertical")
-    scrollbar.pack(side="right", fill="y")
-    # Create the tasks listbox
-    tasks_listbox = Listbox(running_tasks_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff",
-                            selectbackground="#cccccc", highlightthickness=0,yscrollcommand=scrollbar.set)
-    tasks_listbox.pack(padx=10, pady=10)
-    scrollbar.config(command=tasks_listbox.yview)
 
+    # scrollbar = Scrollbar(running_tasks_window, orient="vertical")
+    # scrollbar.pack(side="right", fill="y")
+    # # Create the tasks listbox
+    # tasks_listbox = Listbox(running_tasks_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff",
+    #                         selectbackground="#cccccc", highlightthickness=0,yscrollcommand=scrollbar.set)
+    # tasks_listbox.pack(padx=10, pady=10)
+    # scrollbar.config(command=tasks_listbox.yview)
+
+
+
+
+    columns = ('last_name', 'email')
+
+    tree = ttk.Treeview(running_tasks_window, columns=columns, show='headings')
+
+    # define headings
+
+    tree.heading('last_name', text='Name of the task')
+    tree.heading('email', text='Name of the employee')
+
+    # pack the treeview widget
+    tree.pack()
 
     close_button = customtkinter.CTkButton(running_tasks_window, text="Close", command=running_tasks_window.destroy)
     close_button.pack(padx=10, pady=10)
-
-    tasks_listbox.delete(0, END)
-
-    # Insert default value
-    tasks_listbox.insert(END, "{:<30} {:^30}".format("Name of the task", "Name of the employee"))
-
-
-    for row in Database_teams.conn.execute('SELECT name, employee, due_date FROM tasks ORDER BY due_date ' ):
-        # Parse the due date from the database row
+    for row in Database_teams.conn.execute('SELECT name, employee, due_date FROM tasks ORDER BY due_date '):
+        task_name = row[0]
+        employee_name = row[1]
         due_date_str = row[2]
-        due_date = datetime.strptime(due_date_str, '%d/%m/%Y').date()
 
-        # Calculate the number of days until the due date
+        # Convert the due date string to a datetime object
+        due_date = datetime.strptime(due_date_str, '%d/%m/%Y').date()
         days_remaining = (due_date - date.today()).days
 
-        # Set the color based on the number of days remaining
+        # Insert the record into the treeview
+        item = tree.insert("", "end", text="", values=(task_name, employee_name, due_date_str))
+
+
+        # Change the background color of the row if the due date is within 3 days
         if days_remaining < 0:
-            color = RED
+            tree.item(item, tags=("overdue","myfont"))
         elif days_remaining < 4:
-            color = RED
+                tree.item(item, tags=("overdue","myfont"))
         elif days_remaining < 7:
-            color = ORANGE
+                tree.item(item, tags=("slightly","myfont"))
         else:
-            color = GREEN
-        base = 70
-        h = len(row[0])
-        dd = base - h
-        # Add the item to the listbox with the appropriate background color
-        tasks_listbox.insert(END, "{:<{}} {:^0}".format(row[0],dd, row[1] ))
-        tasks_listbox.itemconfig(END, bg=color)
+            tree.item(item, tags=("normal","myfont"))
 
 
-    def double_click(event):
-        selected_text = tasks_listbox.get(ANCHOR)
-        if tasks_listbox.index(ANCHOR) == 0:
-            return 0
-        task_name, employee_name = selected_text.split()
-        bbox = tasks_listbox.bbox(ANCHOR)
-        if event.x < (bbox[0] + bbox[2]) / 2:
-            open_task_window(task_name,employee_name)
-        else:
+# Define the tags for the row colors
+    tree.column("email", anchor="center")
+
+    tree.tag_configure("overdue", background="red")
+    tree.tag_configure("slightly", background="orange")
+    tree.tag_configure("normal", background="green")
+    tree.tag_configure("myfont", font=("Helvetica", 12))
+
+    def treeview_double_click(event):
+        item = tree.item(tree.selection())
+        column = tree.identify_column(event.x)
+
+        if column == '#1':  # First column (Name of the Task) was clicked
+            task_name = item['values'][0]
+            open_task_window(task_name, item['values'][1])
+        elif column == '#2':  # Second column (Name of the Employee) was clicked
+            employee_name = item['values'][1]
             show(employee_name)
+            # Do something with the employee name
+    tree.bind('<Double-1>', treeview_double_click)
 
-    tasks_listbox.bind('<Double-1>', double_click)
     running_tasks_window.focus_set()
     running_tasks_window.mainloop()
 
@@ -98,6 +112,7 @@ def open_task_window(task_name,employee_name):
     # Create the main window
     window = customtkinter.CTk()
     window.title("View Task")
+    window.resizable(False,False)
 
     # Create the task name label and entry field
     name_label = customtkinter.CTkLabel(window, text="Task Name:")
@@ -110,7 +125,7 @@ def open_task_window(task_name,employee_name):
     # Create the task description label and text field
     description_label = customtkinter.CTkLabel(window, text="Task Description:")
     description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-    description_entry = customtkinter.CTkTextbox(window, height=20, width=140)
+    description_entry = customtkinter.CTkTextbox(window, height=80, width=140)
     description_entry.insert(END, task[1])
     description_entry.configure(state="disabled")
     description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
@@ -164,6 +179,34 @@ def open_task_window(task_name,employee_name):
     # Create the close button
     close_button = customtkinter.CTkButton(window, text="Close",command= lambda: window.destroy())
     close_button.grid(row=7, column=1, padx=(0, 95), pady=5)
+    def displayrows():
+        rows = Database_teams.smlouvaread(task[0])
+        print(rows)
+
+        for row in rows:
+            if row[2] !=" ":
+                t.insert('end', str(row[2]) + '\n\n')
+            if row[3] !=" ":
+                t.insert('end', str(row[3]) + '\n\n')
+            if row[4] !=" ":
+                t.insert('end', str(row[4]) + '\n\n')
+            if row[5] !=" ":
+                t.insert('end', str(row[5]) + '\n\n')
+
+    windowsmlouva = customtkinter.CTkToplevel(window)
+    windowsmlouva.title("Smlouva")
+    window_width = 420
+    window_height = 350
+    screen_width = windowsmlouva.winfo_screenwidth()
+    screen_height = windowsmlouva.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2) + 60)
+    y = int((screen_height / 2) - (window_height / 2) + 60)
+    windowsmlouva.geometry(f"{window_width}x{window_height}+{z}+{y}")
+
+    t = customtkinter.CTkTextbox(windowsmlouva,width=420,height=350)
+    t.pack()
+
+    displayrows()
 
 
     window.mainloop()

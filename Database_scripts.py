@@ -1,10 +1,8 @@
-import io
+
 import sqlite3 as sq3
-from tkinter import messagebox, filedialog, Label
 
-from PIL import Image, ImageTk
 
-import User_Manage
+
 idp = 1
 value = True
 rodic = 1

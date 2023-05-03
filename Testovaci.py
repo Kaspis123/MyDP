@@ -2,8 +2,7 @@ import tkinter as tk
 import io
 from tkinter import *
 from tkinter import messagebox
-from tkinter.ttk import *
-import Send_SMS
+
 import pyperclip
 
 import Change_Link
@@ -34,86 +33,98 @@ def Test():
     window.title("Test")  # Pojmenování aplikace
     window.resizable(False, False)
 
-    my_image = customtkinter.CTkImage(light_image=Image.open("arrow.jpg"))
-    btn = customtkinter.CTkButton(window, text="", width=10, image=my_image, hover=True,
-                                  command=lambda: buttonfunctions(window))
-    btn.grid(row=0, column=0, padx=10, pady=10)
+    btn = customtkinter.CTkButton(window, text="Back", width=10, hover=True,
+                                   command=lambda: buttonfunctions(window))
+    btn.pack(side="top", anchor="w", padx=10, pady=10)
 
-    lbl_search = customtkinter.CTkLabel(window, text='Name of the Script', width=10, font=customtkinter.CTkFont(size=15,
-                                                                                        weight="bold"), corner_radius=5)
-    lbl_search.grid(row=1, column=1, padx=(30, 0))
+    search_frame = customtkinter.CTkFrame(window)
+    search_frame.pack(side="top", fill="x", padx=10, pady=10)
 
+    # Define the "Name of the Script" label
+    lbl_search = customtkinter.CTkLabel(search_frame, text='Name of the Script', font=customtkinter.CTkFont(size=15,
+                                                                                                            weight="bold"),
+                                        corner_radius=5)
+    lbl_search.pack(side="left", padx=(30, 0), pady=10)
+
+    # Define the "Hostname Search" entry field
     hostname_search = StringVar()
-    hostname_search_entry = customtkinter.CTkEntry(window, textvariable=hostname_search, width=100, height=10,
+    hostname_search_entry = customtkinter.CTkEntry(search_frame, textvariable=hostname_search, width=80, height=2,
                                                    border_width=2, corner_radius=5)
-    hostname_search_entry.grid(row=1, column=2, padx=(0, 150))
+    hostname_search_entry.pack(side="left", padx=(0, 10), pady=10)
 
-    bt1 = customtkinter.CTkButton(window, text="Chose by name", width=100,
-                                 height=32,
-                                 border_width=0,
-                                 corner_radius=8,command = lambda: initialize(hostname_search_entry.get(),window))
-    bt1.grid(row=1, column=2, padx=(70, 0))
-    Tentry = customtkinter.CTkTextbox(window, height=100, width=200, state="normal", corner_radius=5, font=customtkinter.CTkFont(size=14,
-                                                                                        weight="normal"))
-    Tentry.grid(row=2, column=1, pady=20, sticky="NSEW")
+    # Define the "Choose by name" button
+    bt1 = customtkinter.CTkButton(search_frame, text="Choose by name", width=20, height=32,
+                                  border_width=0, corner_radius=8,
+                                  command=lambda: initialize(hostname_search_entry.get(), window))
+    bt1.pack(side="left", padx=(10, 0), pady=10)
+
+    # Define the "Textbox" widget
+    Tentry = customtkinter.CTkTextbox(window, height=300, width=150, state="normal", corner_radius=5,
+                                      font=customtkinter.CTkFont(size=14, weight="normal"))
+    Tentry.pack(side="top", padx=10, pady=20)
+    delbutton = customtkinter.CTkButton(window, text="Delete Script",width=20, height=32,
+                                  border_width=0, corner_radius=8,
+                                  command=lambda: deleteScript(hostname_search_entry.get(), Tentry))
+    delbutton.pack(anchor="center")
 
 
-    # command = lambda: [initialize(window, hostname_search_entry.get())])
-    # bt2 = tk.Button(window, text="Search by name", fg="black")
-    # bt2.grid(row=2, column=3, padx=(10, 10), pady=(0, 10))
-    # b2 = Button(window, text="Delete Script", command=lambda: [deleteScript(hostname_search.get())])
-    # b2.grid(row=3, column=4, sticky=W)
-    def update_listbox():
-        # Clear the listbox
-        # listbox.delete(0, END)
-
-        # Insert the current distinct script names from the database into the listbox
-        for row in Database_teams.conn.execute('SELECT DISTINCT name FROM skripty'):
-        # for row in Database_scripts.conn.execute('SELECT DISTINCT name FROM scripts'):
-            # listbox.insert(END, row[0])
-            Tentry.insert(END, f"{row[0]}\n")
-        Tentry.configure(state=DISABLED)
-    # Create a scrollbar
-    # scrollbar = Scrollbar(window)
-    # scrollbar.grid(row=75, column=4, sticky=N + S)
-
-    # Create a Listbox widget
-    # listbox = Listbox(window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff",
-    #                         selectbackground="#cccccc", highlightthickness=0, justify="center", yscrollcommand=scrollbar.set)
-    # listbox.grid(row=5, column=3,padx=(0,10),pady=100)
-    def select_row(event):
-        index = Tentry.index(INSERT)
-        row = index.split(".")[0]
-        # Get the index of the start of the row
-        start_index = f"{row}.0"
-        # Get the index of the end of the row
-        end_index = f"{row}.end"
-        # Get the text in the row
-        text = Tentry.get(start_index, end_index)
-        # Strip any trailing newline characters
-        text = text.rstrip("\n")
-        # Return the text
-        open_new_window_script(text,window)
-        print(text)
-
-    # Configure the scrollbar to work with the Listbox widget
-    # scrollbar.config(command=listbox.yview)
-
-    # Populate the Listbox with data
-    update_listbox()
-    Tentry.bind("<Double-1>", select_row)
+    update_listbox(Tentry)
+    Tentry.bind("<Double-1>", lambda event: select_row(Tentry, window))
     window.mainloop()
+def update_listbox(Tentry):
+    Tentry.configure(state=NORMAL)
+    Tentry.delete("1.0", END)
+    for row in Database_teams.conn.execute('SELECT DISTINCT name FROM skripty'):
 
+        Tentry.insert(END, f"{row[0]}\n")
+    Tentry.configure(state=DISABLED)
 
+def select_row(Tentry,window):
+    index = Tentry.index(INSERT)
+    row = index.split(".")[0]
+    # Get the index of the start of the row
+    start_index = f"{row}.0"
+    # Get the index of the end of the row
+    end_index = f"{row}.end"
+    # Get the text in the row
+    text = Tentry.get(start_index, end_index)
+    # Strip any trailing newline characters
+    text = text.rstrip("\n")
+    # Return the text
+    open_new_window_script(text,window)
 
 def initialize(name,window):
-    x = Database_scripts.conn.execute("SELECT Name FROM scripts WHERE Name = ?", (name,))
+    x = Database_teams.conn.execute("SELECT Name FROM skripty WHERE Name = ?", (name,))
     t = x.fetchone()
     if t == None:
         messagebox.showerror('Error', 'Error: Script with name' + " " + name + " "+ 'not found!')
     else:
         open_new_window_script(name,window)
+def close(window,window2,text,event):
+    data = text.get("1.0", END)
+    window.destroy()
+    window2.destroy()
+    Database_teams.insertinfoabouattack(event, data)
+def on_closing(new):
+    datawindow= customtkinter.CTk()
+    frame = customtkinter.CTkFrame(datawindow)
+    frame.pack(side="top", padx=5, pady=5)
 
+    text = customtkinter.CTkTextbox(datawindow, width=500, height=300)
+    label = customtkinter.CTkLabel(frame,text="Select task!").pack(side="left")
+    teams = Database_teams.conn.execute("SELECT * FROM tasks").fetchall()
+    team_names = [team[0] for team in teams]
+    team_dropdown = customtkinter.CTkComboBox(frame, values=team_names)
+    team_dropdown.pack(side="left")
+    text.pack()
+
+    text.insert("1.0", "Zadejte prosím data o průběhu útoku, pokud se jednalo o útok jaká je Uspěšnost, jaké informace"
+                       " byly získány, co s nimi bylo poté uděláno atd. Nemusí být nutně podrobné. Pokud se nejednalo o"
+                       " útok můžete tuto část ignorovat. !\n")
+
+    btext = customtkinter.CTkButton(datawindow, text="Save", command=lambda: close(datawindow, new, text,team_dropdown.get())).pack()
+
+    datawindow.mainloop()
 def open_new_window_script(event,window):
     # Create a new window
     new_window = customtkinter.CTkToplevel()
@@ -143,20 +154,22 @@ def open_new_window_script(event,window):
 
     bitly_var = StringVar()
     bitly = customtkinter.CTkEntry(new_window, textvariable=bitly_var)
-    bitly.grid(row=10, column=1,pady=50, padx = 40,sticky="w")
+    bitly.grid(row=10, column=1, pady=50, sticky="w")
     bitly_buttin = customtkinter.CTkButton(new_window, text="Get Short URL",command = lambda: Changelink(bitly.get(), bitly_var))
-    bitly_buttin.grid(row=10, column=1,padx = 150)
-    #
+    bitly_buttin.grid(row=10, column=1, padx=150)
 
+    new_window.protocol("WM_DELETE_WINDOW", lambda : on_closing(new_window))
     new_window.wm_attributes("-topmost", True)
     open_new_window_image(event)
+    new_window.mainloop()
 
-def Changelink(url,bitly_var):
+def Changelink(url, bitly_var):
     x = Change_Link.bitlylink(url)
-    print(x)
     bitly_var.set(x)
     pyperclip.copy(bitly_var.get())
-
+def deleteScript(Name, Tentry):
+    Database_teams.deleteScript(Name)
+    update_listbox(Tentry)
 def open_new_window_image(skript):
     # Create a new window
     new_window_image = customtkinter.CTkToplevel()
@@ -198,7 +211,6 @@ def open_new_window_image(skript):
     def display_image(event):
         # Get the selected item from the listbox
         selection = event.widget.curselection()
-        print("yy")
         if selection:
             index = selection[0]
             item = event.widget.get(index)
@@ -252,128 +264,16 @@ def open_new_window_image(skript):
             resize_count += 1
 
         resize_count = 0
-        print(resize_count)
-
-        # def delete_image(event):
-        #     # Get the selected item from the listbox
-        #     selection = event.widget.curselection()
-        #     if selection:
-        #         selected_item = event.widget.get(selection[0])
-        #
-        #
-        #         # Create a popup menu with the option to delete the selected image
-        #         popup_menu = Menu(new_window_image, tearoff=0)
-        #         popup_menu.add_command(label="Delete",
-        #                                command=lambda: [Database_images.delete_image_from_db(selected_item),
-        #                                                 update_listbox_image()])
-        #         popup_menu.add_command(label="Show",
-        #                                command=lambda event=event: [display_image(event), update_listbox_image()])
-        #
-        #         # Display the popup menu at the mouse position
-        #         try:
-        #             popup_menu.tk_popup(event.x_root, event.y_root, 0)
-        #         finally:
-        #             popup_menu.grab_release()
-
-
-        # listbox_images.bind("<Button-3>", delete_image)
-
-    # def update_listbox():
-    #     # Clear the listbox
-    #     # listbox.delete(0, END)
-    #
-    #     # Insert the current distinct script names from the database into the listbox
-    #     for row in Database_scripts.conn.execute('SELECT DISTINCT name FROM scripts'):
-    #         # listbox.insert(END, row[0])
-    #         Tentry.insert(END, f"{row[0]}\n")
-    #     Tentry.configure(state=DISABLED)
-    # # Create a scrollbar
-    # # scrollbar = Scrollbar(window)
-    # # scrollbar.grid(row=75, column=4, sticky=N + S)
-    #
-    # # Create a Listbox widget
-    # # listbox = Listbox(window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff",
-    # #                         selectbackground="#cccccc", highlightthickness=0, justify="center", yscrollcommand=scrollbar.set)
-    # # listbox.grid(row=5, column=3,padx=(0,10),pady=100)
-    #
-    #
-    # # Configure the scrollbar to work with the Listbox widget
-    # # scrollbar.config(command=listbox.yview)
-    #
-    # # Populate the Listbox with data
-    # update_listbox()
-
-    # listbox.bind('<Double-1>', open_new_window_script)
 
 
 
-
-
-
-
-
-
-
-    # def backbutton(T,name):
-    #     global s, number
-    #     global visited_ids
-    #     # check if there is a previous node
-    #     # if s is not None:
-    #     #     # query the database for the previous node
-    #     #     x = Database_scripts.conn.execute("SELECT parent_id,left,right FROM Scripts WHERE id = ?", (number,))
-    #     #
-    #     #     # fetch the row and update the variables
-    #     #     row = x.fetchone()
-    #     #     if row is not None:
-    #     #         data = row[0]
-    #     #         data1 = row[1]
-    #     #         data2 = row[2]
-    #     #         print(data1, data2)
-    #     #         p =  Database_scripts.conn.execute("SELECT Text, id FROM Scripts WHERE Name = ? AND id = ?", (name, data,))
-    #     #         h = p.fetchone()[0]
-    #     #         T.delete("1.0", END)
-    #     #         T.insert(INSERT, h)
-    #     #         # if data1 == None:
-    #     #         print("changed")
-    #     #         number = data
-    #     #         s = data
-    #             #     print(number)
-    #             # else:
-    #             #     print("changed")
-    #             #     s=data
-    #             #     print(s)
-    #     prev_id = visited_ids[-2]
-    #     x = Database_scripts.conn.execute("SELECT Text, id, parent_id,left FROM Scripts WHERE id = ?", (prev_id,))
-    #     row = x.fetchone()
-    #
-    #     data = row[0]
-    #     dat2 = row[1]
-    #     daata = row[2]
-    #     dd = row[3]
-    #
-    #     T.delete("1.0", END)
-    #     T.insert(INSERT, data)
-    #
-    #
-    #     # update the global variables
-    #     global number
-    #     global s
-    #     if dd == "negative":
-    #         number = dat2
-    #     else:
-    #         s = dat2
-    #         print(s)
-    #
-    #     print("Moved back to node with ID:", daata)
-    #     visited_ids.pop()
 
     listbox_images.bind('<Double-1>', display_image)
 
 
 
 
-    def deleteScript(Name):
-        Database_scripts.deleteScript(Name)
+
 
 
 

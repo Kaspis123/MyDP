@@ -1,7 +1,6 @@
 import sqlite3 as sq3
 from tkinter import messagebox, filedialog
 
-import Database_users
 import NewQ
 from User_Manage import get_team_members
 idp= 0
@@ -49,8 +48,8 @@ c.execute('''
      skript TEXT);
 ''')
 
-c.execute("CREATE TABLE IF NOT EXISTS tree (id INTEGER PRIMARY KEY, parent_id INTEGER, name TEXT, value INTEGER)")
 c.execute("CREATE TABLE IF NOT EXISTS skripty (id INTEGER PRIMARY KEY, idp INTEGER, name TEXT,text TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS additional_info (id INTEGER PRIMARY KEY, skripty_name TEXT, text TEXT, FOREIGN KEY(skripty_name) REFERENCES tasks(name))")
 
 def insert_team(team_name):
     c.execute("INSERT INTO Teams (team_name) VALUES (?)", (team_name,))
@@ -223,19 +222,7 @@ def delete_image_from_db(name):
     cur.execute('DELETE FROM images WHERE name = ?', (name,))
     conn.commit()
 
-class Node:
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-        self.children = []
 
-    def add_child(self, child_node):
-        self.children.append(child_node)
-def insert_node_to_database(parent_id, name, value):
-    c.execute("INSERT INTO tree (parent_id, name, value) VALUES (?, ?, ?)", (parent_id, name, value))
-
-def get_node_from_database(value):
-    c.execute("SELECT name FROM tree WHERE value=? ", (value))
 
 def databaseforscriptsinsert(Name,Text):
 
@@ -271,3 +258,59 @@ def smlouvaread(name):
     rows = cur.fetchall()
     return rows
 
+def insertinfoabouattack(name,text):
+    cur = conn.cursor()
+    print(name,text)
+    cur.execute("INSERT INTO additional_info (skripty_name, text) VALUES (?, ?)", (name, text))
+    conn.commit()
+
+def getinfoabouattack(name):
+    cur = conn.cursor()
+    # cur.execute('''SELECT * FROM additional_info''')
+    cur.execute('''SELECT * FROM additional_info WHERE skripty_name = ?''', (name,))
+    try:
+        rows = cur.fetchone()[2]
+        return rows
+    except:
+        return 0
+
+def deleteScript(Name):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM skripty WHERE Name = ?", [Name])
+    conn.commit()
+
+def getdataforlogin(name, password):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM members WHERE name=? and password =?",(name,password))
+    get = cur.fetchall()
+    if get != []:
+        return True
+    else:
+        return False
+
+
+def ismanagement(name):
+    # cur=conn.cursor()
+    # cur.execute("SELECT team_name FROM Teams JOIN Users ON Teams.team_id = Users.team_id WHERE Users.user_name = ?", (name,))
+    # getteam= cur.fetchone()
+    # print(getteam)
+    c = conn.execute("SELECT team_id FROM Teams WHERE team_name=?",
+                                    ("Management",))  # pass team_name as a tuple with str()
+    team_id = c.fetchone()[0]
+
+
+    # Get the members of the team from the database
+    c.execute("SELECT user_name FROM Users WHERE team_id=? and user_name = ?", (team_id, name))
+    members = c.fetchall()
+    print(members)
+    if members != []:
+        return True
+    else:
+        return False
+
+def smlouvaread2(name):
+    cur = conn.cursor()
+    cur.execute('''SELECT var1,var2,var3,var4 FROM subtasks WHERE task_name = ?''', (str(name),))
+    rows = cur.fetchall()
+    print(rows)
+    return rows

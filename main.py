@@ -1,6 +1,7 @@
 import tkinter
+from tkinter import messagebox
 
-
+import Database_teams
 import InsideApp
 from PIL import ImageTk
 
@@ -21,20 +22,20 @@ def resize_widgets(event):
 
 
 def Log_in():
-    # Check = Database.get_data_from_database(EntryUser.get(), PasswordEntry.get())
-    print(EntryUser.get())
-    InsideApp.set_name(EntryUser.get())
-    window.destroy()
-    InsideApp.InsideApp()
+    Check = Database_teams.getdataforlogin(EntryUser.get(), PasswordEntry.get())
+    # InsideApp.set_name(EntryUser.get())
+    # window.destroy()
+    # InsideApp.InsideApp()
 
 
 
-    # x = EntryUser.get()
-    # if Check == True:
-    #     window.destroy()
-    #     InsideApp.InsideApp(x)
-    # else:
-    #     messagebox.showerror("Error", "Wrong Username or Password")
+
+    if Check == True:
+        InsideApp.set_name(EntryUser.get())
+        window.destroy()
+        InsideApp.InsideApp()
+    else:
+        messagebox.showerror("Error", "Wrong Username or Password")
 
 cavas = tkinter.Canvas(window, width=1980, height=1080)
 cavas.pack(expand=True, fill='both')
@@ -51,6 +52,7 @@ Password = tkinter.Label(window, text="Password ")
 cavas.create_window(x/2-90, y/2-55, window=Password, anchor="center")
 PasswordEntry = tkinter.Entry(window, show="*")
 cavas.create_window(x/2+10, y/2-55, window=PasswordEntry, anchor="center")
+window.bind("<Return>", lambda event: Log_in())
 window.mainloop()  # spuštění
 
 

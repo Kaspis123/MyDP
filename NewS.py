@@ -1,19 +1,19 @@
 import io
 import tkinter as tk
 
-from tkinter import Canvas, messagebox
+
 from tkinter import *
-from tkinter.ttk import *
+
 import customtkinter
 
 import Change_Link
-import Database_scripts
+
 
 import Database_teams
 import InsideApp
 import pyperclip
 from PIL import ImageTk, Image
-import tkinter.font as tkfont
+
 
 
 x = 0
@@ -23,46 +23,7 @@ resize_count = 0
 flag = True
 
 
-def button(T, name, window):
-    global x
-    global y
-    global number
-    global flag
-    flag = True
-    x-=1
-    y=+1
-    retrieve_input(T, name, window)
 
-def retrieve_input(T,name,window):
-    global x
-    global number
-    global y
-    global flag
-    Database_scripts.set_number(number)
-    Database_scripts.set_flag(flag)
-    input = T.get("1.0", END)
-    T.delete("1.0", END)  # Clear the text from the input area
-
-    if name == '':
-        x = 1
-        number = 1
-        window.destroy()
-        NewS()
-        messagebox.showerror("Error", "No data provided")
-    else:
-        if flag:
-            T.insert(INSERT, "Zadejte text při negativní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
-            y += 1
-        else:
-            T.insert(INSERT, "Zadejte text při pozitivní odpovědi na " + Database_scripts.databaseforscriptsread(name, number))
-            x += 1
-        if y > x:
-            flag = False
-            y = 1
-        else:
-            flag = True
-            number += 1
-    return input
 
 def retrieve(T,name,window):
     input = T.get("1.0", END)
@@ -105,11 +66,11 @@ def NewS():
     hostname_search_entry.grid(row=1, column=3, padx=10, pady=10)
 
     # image = PhotoImage(file="arrow.jpg")
-    my_image = customtkinter.CTkImage(light_image=Image.open("arrow.jpg"))
-    btn = customtkinter.CTkButton(window, text= "", width=10, image=my_image, hover=True,  command=lambda: buttonfunctions(window))
+
+    btn = customtkinter.CTkButton(window, text= "Back", width=10, hover=True,  command=lambda: buttonfunctions(window))
     btn.grid(row=0, column=0, padx=10, pady=10)
 
-    T = customtkinter.CTkTextbox(window, height=80, width=40)
+    T = customtkinter.CTkTextbox(window, height=150, width=40)
     T.grid(row=10, column=3, padx=10, pady=10, sticky="NSEW")
     T.insert(tk.INSERT, "Úvodní věta")
 
@@ -119,11 +80,11 @@ def NewS():
                                  border_width=0,
                                  corner_radius=8, command=lambda: b1functions(hostname_search.get(),T,window))
     b1.grid(row=50, column=3, sticky=tk.E, padx=10, pady=10)
-    stop_button = customtkinter.CTkButton(window,width=100,
-                                 height=32,
-                                 border_width=0,
-                                 corner_radius=8, text="Stop this Branch", command=lambda: button(T, hostname_search.get(), window))
-    stop_button.grid(row=50, column=3, pady=10, padx=10, sticky=tk.W)
+    # stop_button = customtkinter.CTkButton(window,width=100,
+    #                              height=32,
+    #                              border_width=0,
+    #                              corner_radius=8, text="Stop this Branch", command=lambda: button(T, hostname_search.get(), window))
+    # stop_button.grid(row=50, column=3, pady=10, padx=10, sticky=tk.W)
 
     window.eval('tk::PlaceWindow %s center' % window.winfo_toplevel())
 
