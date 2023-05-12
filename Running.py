@@ -39,8 +39,13 @@ def Running():
 
 
     columns = ('last_name', 'email')
+    style = ttk.Style(running_tasks_window)
+    # set ttk theme to "clam" which support the fieldbackground option
+    style.theme_use("clam")
+    style.configure("Treeview", background="#323332",
+                    fieldbackground="#323332", foreground="#000000")
 
-    tree = ttk.Treeview(running_tasks_window, columns=columns, show='headings')
+    tree = ttk.Treeview(running_tasks_window,style="Treeview", columns=columns, show='headings')
 
     # define headings
 
@@ -48,10 +53,10 @@ def Running():
     tree.heading('email', text='Name of the employee')
 
     # pack the treeview widget
-    tree.pack()
+    tree.pack(expand=True,fill=BOTH)
 
     close_button = customtkinter.CTkButton(running_tasks_window, text="Close", command=running_tasks_window.destroy)
-    close_button.pack(padx=10, pady=10)
+    close_button.pack(padx=(140, 140), pady=10, expand=True, fill=BOTH, anchor=CENTER)
     for row in Database_teams.conn.execute('SELECT name, employee, due_date FROM tasks ORDER BY due_date '):
         task_name = row[0]
         employee_name = row[1]
@@ -77,8 +82,8 @@ def Running():
 
 
 # Define the tags for the row colors
-    tree.column("email", anchor="center")
 
+    tree.column("email", anchor="center")
     tree.tag_configure("overdue", background="red")
     tree.tag_configure("slightly", background="orange")
     tree.tag_configure("normal", background="green")

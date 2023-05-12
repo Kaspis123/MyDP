@@ -1,14 +1,10 @@
 import io
 import tkinter as tk
-
+from tkinter import filedialog, messagebox
 
 from tkinter import *
-
 import customtkinter
-
 import Change_Link
-
-
 import Database_teams
 import InsideApp
 import pyperclip
@@ -185,22 +181,11 @@ def NewS():
             listbox.insert(END, row[0])
 
     listbox = Listbox(window)
-    # update_listbox()
-    # listbox.grid(row=75, column=3)
-    # listbox.bind('<Double-1>', display_image)
-    # listbox.bind("<Button-3>", delete_image)
-    # messagebox.showinfo("Information", "Prosím dodržujte právní zásady, viz zádání úkolu.")
-
-
-
     window.mainloop()
-
-
-
 
 def Changelink(url,bitly_var):
     x = Change_Link.bitlylink(url)
-    print(x)
+
     bitly_var.set(x)
     pyperclip.copy(bitly_var.get())
 
@@ -221,11 +206,16 @@ def Back():
 #     retrieve_input(T, name, window)
 
 def b1functions(name ,T, window):
-    Database_teams.databaseforscriptsinsert(name,T.get("1.0", END))
-    retrieve(T,name,window)
+    if name == "default":
+        messagebox.showerror('Required Fields', 'Name default is reserved')
+    else:
+        Database_teams.databaseforscriptsinsert(name, T.get("1.0", END))
+        retrieve(T,name,window)
+
 
 def buttonimagefunctions(name):
     Database_teams.insert_image(name)
+
 def buttonfunctions(window):
     window.destroy()
     Back()

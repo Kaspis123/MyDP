@@ -10,12 +10,16 @@ import Database_scripts
 import Database_teams
 import InsideApp
 from PIL import ImageTk, Image
+
+
 import customtkinter
+import sms
+
 number = 1
 i=1
 resize_count = 0
 s=1
-visited_ids = []
+
 
 def Test():
     global number
@@ -70,6 +74,7 @@ def Test():
 
     update_listbox(Tentry)
     Tentry.bind("<Double-1>", lambda event: select_row(Tentry, window))
+    window.protocol("WM_DELETE_WINDOW", lambda: on_closing1(window))
     window.mainloop()
 def update_listbox(Tentry):
     Tentry.configure(state=NORMAL)
@@ -142,6 +147,7 @@ def open_new_window_script(event,window):
     #     index = selection[0]
     #     item = event.widget.get(index)
     T = customtkinter.CTkTextbox(new_window, height=150, width=500)
+
     T.grid(row=5, column=1)
     # x = Database_teams.databaseforscriptsread(event, number)
     x= Database_teams.databaseforscriptsread(event,number)
@@ -152,6 +158,8 @@ def open_new_window_script(event,window):
                                                                                                          column=1,sticky="w")
     btn1 = customtkinter.CTkButton(new_window, text="Pozitivni",  command=lambda: update4(T, event)).grid(row=6,column=1,)
 
+    sndsmsbutton = customtkinter.CTkButton(new_window,text= "Send SMS", command=lambda: sendsms(new_window)).grid(row=12,column=1)
+
     bitly_var = StringVar()
     bitly = customtkinter.CTkEntry(new_window, textvariable=bitly_var)
     bitly.grid(row=10, column=1, pady=50, sticky="w")
@@ -159,7 +167,7 @@ def open_new_window_script(event,window):
     bitly_buttin.grid(row=10, column=1, padx=150)
 
     new_window.protocol("WM_DELETE_WINDOW", lambda : on_closing(new_window))
-    new_window.wm_attributes("-topmost", True)
+    # new_window.wm_attributes("-topmost", True)
     open_new_window_image(event)
     new_window.mainloop()
 
@@ -281,7 +289,7 @@ def open_new_window_image(skript):
 def increment_number(T, name):
     global number  # use global keyword to access and update the global variable
     global s  # use global keyword to access and update the global variable
-    global visited_ids
+
     # print(s)
     x = Database_scripts.conn.execute("SELECT Text, id FROM Scripts WHERE Name = ? AND right = ? AND parent_id = ?", (name, "positive", s))
     row = x.fetchone()
@@ -290,7 +298,7 @@ def increment_number(T, name):
         dat2 = row[1]
         number = dat2
         s = dat2
-        visited_ids.append(dat2)
+
         T.configure(state="normal")
         T.delete("1.0", END)
         T.insert(INSERT, data)
@@ -304,7 +312,7 @@ def update2(T, name):
     if row is not None:
         dat2 = row[1]
         number = dat2
-        visited_ids.append(dat2)
+
         x = Database_scripts.databaseforscriptsread(name, number)
         T.configure(state="normal")
         T.delete("1.0", END)
@@ -353,3 +361,34 @@ def update3(T,name):
     T.delete("1.0", END)
     T.insert(INSERT, x)
     T.configure(state=DISABLED)
+def sendsms(window):
+    windowforsms = customtkinter.CTkToplevel(window)
+    windowforsms.resizable(False, False)
+    windowforsms.title("Send SMS")
+    window_width = 250
+    window_height = 170
+    screen_width = windowforsms.winfo_screenwidth()
+    screen_height = windowforsms.winfo_screenheight()
+    x = int((screen_width / 2) - (window_width / 2) +400)
+    y = int((screen_height / 2) - (window_height / 2) +100)
+    windowforsms.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    customtkinter.CTkLabel(windowforsms, text="Number").pack()
+    number = customtkinter.CTkEntry(windowforsms,)
+    number.pack()
+    customtkinter.CTkLabel(windowforsms, text="Message").pack()
+    zprava = customtkinter.CTkEntry(windowforsms)
+    zprava.pack()
+    customtkinter.CTkButton(windowforsms, text="Send", command=lambda : data(number.get(),zprava.get())).pack(pady=10)
+
+def data(number,data):
+
+    p = sms.main(number,data)
+    messagebox.showinfo("Info", p)
+def on_closing1(window):
+    global number,i,resize_count,s
+    number = 1
+    i = 1
+    resize_count = 0
+    s = 1
+    window.destroy()
+    InsideApp.InsideApp()

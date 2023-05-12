@@ -1,6 +1,6 @@
 import sqlite3 as sq3
 from tkinter import messagebox, filedialog
-
+import bcrypt
 import NewQ
 from User_Manage import get_team_members
 idp= 0
@@ -37,7 +37,7 @@ c.execute('''
     CREATE TABLE IF NOT EXISTS members
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
      name CHAR(25),
-     password CHAR(25));
+     password CHAR(60));
 ''')
 
 c.execute('''
@@ -52,6 +52,10 @@ c.execute("CREATE TABLE IF NOT EXISTS skripty (id INTEGER PRIMARY KEY, idp INTEG
 c.execute("CREATE TABLE IF NOT EXISTS additional_info (id INTEGER PRIMARY KEY, skripty_name TEXT, text TEXT, FOREIGN KEY(skripty_name) REFERENCES tasks(name))")
 
 def insert_team(team_name):
+    c.execute("SELECT team_name from Teams Where team_name = ?", (team_name,))
+    result = c.fetchone()
+    if result is not None:
+        return 0
     c.execute("INSERT INTO Teams (team_name) VALUES (?)", (team_name,))
     conn.commit()
 
@@ -78,6 +82,8 @@ def delete_team(team_name):
 
 def add_user_to_team(selected_team, selected_user):
     # Get the selected user and team from their respective Listboxes
+    if selected_user == "admin":
+        return 0
 
     c.execute('SELECT team_id FROM Teams WHERE team_name=?', (selected_team,))
     team_id = c.fetchone()[0]
@@ -87,6 +93,7 @@ def add_user_to_team(selected_team, selected_user):
     conn.commit()
 
 def delete_user_from_team(user_name):
+
     c.execute("DELETE FROM Users WHERE user_name=?", (user_name,))
     conn.commit()
 
@@ -150,14 +157,17 @@ def add_task_for_team(team_name, task_name, creation_date, task_description, tas
 
 def insert_user(name, password):
     # Check if the user already exists
+    cur.execute("SELECT * FROM members WHERE name='" + name + "' and password ='" + password + "'")
     cursor = conn.execute('SELECT id FROM members WHERE name=?', (name,))
     if cursor.fetchone() is not None:
-        return
-    # Insert the new user
-    conn.execute('INSERT INTO members (name, password) VALUES (?, ?)', (name, password))
+        return 0
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    conn.execute('INSERT INTO members (name, password) VALUES (?, ?)', (name, hashed_password))
     conn.commit()
 
 def delete_user(name):
+
     # Check if the user exists
     cursor = conn.execute('SELECT id FROM members WHERE name=?', (name,))
     if cursor.fetchone() is None:
@@ -170,12 +180,11 @@ def delete_user(name):
 
 
 def user_exists(name):
-    print(name)
     cursor = conn.execute("SELECT name FROM members WHERE name=? ", (name,))
     check = cursor.fetchone()
-    print(check)
     if check != None:
         return 0
+
     conn.commit()
 
 
@@ -280,13 +289,13 @@ def deleteScript(Name):
     conn.commit()
 
 def getdataforlogin(name, password):
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM members WHERE name=? and password =?",(name,password))
-    get = cur.fetchall()
-    if get != []:
-        return True
-    else:
+
+    cursor = conn.execute('SELECT password FROM members WHERE name=?', (name,))
+    result = cursor.fetchone()
+    if result is None:
         return False
+    hashed_password = result[0]
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
 
 
 def ismanagement(name):
@@ -294,6 +303,7 @@ def ismanagement(name):
     # cur.execute("SELECT team_name FROM Teams JOIN Users ON Teams.team_id = Users.team_id WHERE Users.user_name = ?", (name,))
     # getteam= cur.fetchone()
     # print(getteam)
+    print(name)
     c = conn.execute("SELECT team_id FROM Teams WHERE team_name=?",
                                     ("Management",))  # pass team_name as a tuple with str()
     team_id = c.fetchone()[0]
@@ -314,3 +324,30 @@ def smlouvaread2(name):
     rows = cur.fetchall()
     print(rows)
     return rows
+
+def is_last_user_in_team(user_name):
+
+    c = conn.cursor()
+
+    # Get the team_id for the user's team
+    c.execute("SELECT team_id FROM Users WHERE user_name = ?", (user_name,))
+    result = c.fetchone()
+    if result is None:
+
+        return False
+    team_id = result[0]
+
+    # Count the number of users in the team
+    c.execute("SELECT COUNT(*) FROM Users WHERE team_id = ?", (team_id,))
+    result = c.fetchone()
+    if result is None:
+        return False
+    user_count = result[0]
+
+
+    # Check if the user is the last one in the team
+    if user_count == 1:
+        return True
+    else:
+        return False
+

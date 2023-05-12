@@ -10,7 +10,14 @@ import customtkinter
 def Managemet():
     window = customtkinter.CTk()
     window.title("Management")
-    window.geometry("700x500")
+    window.resizable(False,False)
+    window_width = 700
+    window_height = 500
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    window.geometry(f"{window_width}x{window_height}+{z}+{y}")
 
 
     btn = customtkinter.CTkButton(window,text="Back", command=lambda: backbuttonfunctions(window))
@@ -41,18 +48,18 @@ def Managemet():
     scrollbar = tk.Scrollbar(frame, orient="vertical")
     scrollbar.pack(side="left", fill="y")
 
-    listbox = tk.Listbox(frame, height=10, width=25, font=("Helvetica", 13), bd=2, bg="#ffffff",
-                            selectbackground="#cccccc", highlightthickness=0, yscrollcommand=scrollbar.set, selectmode=BROWSE)
+    listbox = tk.Listbox(frame, height=10, width=25, font=("Helvetica", 13), bd=2, bg="#323332",
+                            selectbackground="#323332", highlightthickness=0, yscrollcommand=scrollbar.set, selectmode=BROWSE)
     listbox.pack(side="left", expand=False, fill="both", padx=10)
 
     scrollbar.config(command=listbox.yview)
 
     scrollbar2 = tk.Scrollbar(frame, orient="vertical")
     scrollbar2.pack(side="right", fill="y")
-    listbox_teams = tk.Listbox(frame, height=10, width=25, font=("Helvetica", 13), bd=2, bg="#ffffff",
-                               selectbackground="#cccccc", highlightthickness=0,
+    listbox_teams = tk.Listbox(frame, height=10, width=25, font=("Helvetica", 13), bd=2, bg="#323332",
+                               selectbackground="#323332", highlightthickness=0,
                                selectmode=BROWSE,justify="center",yscrollcommand=scrollbar2.set)
-    listbox_teams.pack(side="right", expand=False, fill="both", padx=20)
+    listbox_teams.pack(side="right", expand=False, fill="both", padx=20,)
     scrollbar2.config(command=listbox_teams.yview)
 
     # Create a frame for the add and delete user buttons
@@ -77,6 +84,7 @@ def Managemet():
 
     def update_listbox():
         listbox.delete(0, tk.END)
+        listbox.configure(fg="#d7d6d7")
         listbox.insert(0, 'ID   Name')
         for row in Database_teams.conn.execute('SELECT id, name FROM members'):
             listbox.insert(tk.END, f'{row[0]:<3} {row[1]}')
@@ -107,14 +115,18 @@ def Managemet():
             new_window.lift()
 
     def remove_User(Name, new_window):
-        if Name == '':
-            messagebox.showerror("Error", "No user found")
 
+        p = Database_teams.is_last_user_in_team(Name)
+        if Database_teams.user_exists(Name) != 0:
+            messagebox.showerror("Error", "No user found")
+        elif p == True:
+            messagebox.showerror("Error", "Last person in management")
         else:
             Database_teams.delete_user_from_team(Name)
             Database_teams.delete_user(Name)
             update_listbox()
             new_window.destroy()
+
 
 
     def open_new_window():
@@ -195,22 +207,30 @@ def Managemet():
             messagebox.showerror("Error", "Name must contain atleast 3 characters")
             return 0
         elif len(Password) < 3:
-
             messagebox.showerror("Error", "Password must contain atleast 3 characters")
             return 0
         else:
-            Database_teams.insert_user(User, Password)
+           p = Database_teams.insert_user(User, Password)
+           if p == 0:
+               messagebox.showerror("Error","User with this name exists")
+               return 0
+
 
     def update_Listbox2(Name):
         listbox.delete(0, tk.END)
+        listbox.configure(fg="#d7d6d7")
         listbox.insert(0, 'ID   Name')
+
         cur = Database_teams.conn.cursor()
         cur.execute('SELECT id, name FROM members WHERE name=?', (Name,))
         rows = cur.fetchall()
         for row in rows:
             listbox.insert(tk.END, f'{row[0]:<3} {row[1]}')
+
     def update_listbox_team():
+        listbox_teams.configure(fg="#d7d6d7")
         listbox_teams.delete(0, tk.END)
+
         listbox_teams.insert(0, 'Teams')
         listbox_teams.insert(0, 'Default')
         cur = Database_teams.conn.cursor()
@@ -218,6 +238,7 @@ def Managemet():
         rows = cur.fetchall()
         for row in rows:
             listbox_teams.insert(tk.END, row)
+
 
     update_listbox_team()
     def Back():
@@ -254,9 +275,12 @@ def Managemet():
 
     def add_team_to_database(team_name, window4):
 
-        Database_teams.insert_team(team_name)
-        update_listbox_team()
-        window4.destroy()
+        x = Database_teams.insert_team(team_name)
+        if x ==0:
+            messagebox.showerror("Error", " Team with name " + team_name + " exists!")
+        else:
+            update_listbox_team()
+            window4.destroy()
 
 
 
@@ -316,10 +340,12 @@ def Managemet():
         save_button.grid(row=2, column=0, columnspan=2, padx=(55, 0), pady=10)
         new_window.attributes("-topmost", True)
     def delete_team_from_database(team_name,windwod):
-
-        Database_teams.delete_team(team_name)
-        windwod.destroy()
-        update_listbox_team()
+        if team_name == "Management":
+            messagebox.showerror('Error', 'Management team can not be deleted')
+        else:
+            Database_teams.delete_team(team_name)
+            windwod.destroy()
+            update_listbox_team()
 
     def add_user_to_team():
         new_window = customtkinter.CTkToplevel()
@@ -337,7 +363,7 @@ def Managemet():
         name_label = customtkinter.CTkLabel(new_window, text="Name:")
         name_label.grid(row=0, column=0, padx=10, pady=10)
 
-        names = Database_teams.conn.execute("SELECT * FROM users").fetchall()
+        names = Database_teams.conn.execute("SELECT * FROM Users").fetchall()
         list_names = [name[1] for name in names]
         list_dropdown = customtkinter.CTkComboBox(new_window, values=list_names)
         list_dropdown.grid(column=1, row=0, padx=5, pady=5, sticky=tk.W)
@@ -346,7 +372,7 @@ def Managemet():
 
         # Add a button to save the data and close the window
         save_button = customtkinter.CTkButton(new_window, text="Add",
-                                command=lambda: Database_teams.add_user_to_team(team_dropdown.get(),list_dropdown.get()))
+                                command=lambda: usertodatabase(team_dropdown.get(),list_dropdown.get(),new_window))
 
         # Grid the labels, entry fields, and button
 
@@ -377,4 +403,8 @@ def get_team_members(team_name):
 
     return members
 
-
+def usertodatabase(team, list,window):
+    p = Database_teams.add_user_to_team(team, list)
+    if p == 0:
+        messagebox.showerror("Error", "Admin must stay in team Management")
+    window.destroy()

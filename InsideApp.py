@@ -9,7 +9,7 @@ import NewS
 import User_Manage
 import Testovaci
 import customtkinter
-
+from tkPDFViewer import tkPDFViewer as pdf
 import Quests
 name = 0
 
@@ -28,14 +28,15 @@ def InsideApp():
         btn5 = customtkinter.CTkButton(windowAPP, text="User Management",
                                   command=lambda: bt5(windowAPP) ).pack(pady=10)
 
-    btn4 = customtkinter.CTkButton(windowAPP, text="New Scam",command=lambda :bt4(windowAPP)).pack(pady=10)
+    btn4 = customtkinter.CTkButton(windowAPP, text="New Script",command=lambda :bt4(windowAPP)).pack(pady=10)
 
 
-    btn6 = customtkinter.CTkButton(windowAPP, text="test", command=lambda :bt6(windowAPP)).pack(pady=10)
+    btn6 = customtkinter.CTkButton(windowAPP, text="Test", command=lambda :bt6(windowAPP)).pack(pady=10)
 
 
     btn8 = customtkinter.CTkButton(windowAPP, text="Quests", command=lambda: Quest(name)).pack(pady=10
         )
+    btn9 = customtkinter.CTkButton(windowAPP,text="Help", command= lambda: PDF()).pack(pady=10)
     popup()
 
 
@@ -79,3 +80,20 @@ def Finished():
 
 def NewScript():
     NewS.NewS()
+
+def PDF():
+    new_window = customtkinter.CTkToplevel()
+    new_window.resizable(True, True)
+    new_window.title("PDF File")
+    window_width = 600
+    window_height = 600
+    screen_width = new_window.winfo_screenwidth()
+    screen_height = new_window.winfo_screenheight()
+    x = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    new_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    file_path = "pdf_files/NávodApl.pdf"
+    if file_path:
+        v1 = pdf.ShowPdf()
+        v2 = v1.pdf_view(new_window, pdf_location=open(file_path, "r"))
+        v2.pack()

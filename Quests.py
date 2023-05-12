@@ -3,6 +3,8 @@
 from tkinter import *
 
 from datetime import datetime
+from tkinter import ttk
+
 from tkcalendar import DateEntry
 from datetime import date
 from tkPDFViewer import tkPDFViewer as pdf
@@ -24,7 +26,7 @@ def show(name1):
 
 
     # Create the tasks listbox
-    tasks_listbox = Listbox(tasks_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff", selectbackground="#cccccc", highlightthickness=0,justify="center")
+    tasks_listbox = Listbox(tasks_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#323332", selectbackground="#cccccc", highlightthickness=0,justify="center")
     tasks_listbox.pack(padx=10, pady=10)
 
     close_button = customtkinter.CTkButton(tasks_window, text="Close", command=lambda: tasks_window.destroy())
@@ -33,8 +35,6 @@ def show(name1):
     def getlistbox():
         tasks_listbox.delete(0, END)
 
-        # Insert default value
-        tasks_listbox.insert(END, "Name")
         for row in Database_teams.conn.execute(
                 'SELECT name, due_date FROM tasks WHERE employee=? ORDER BY due_date ',
                 (name1,)):
@@ -58,7 +58,7 @@ def show(name1):
             # Add the item to the listbox with the appropriate background color
             tasks_listbox.insert(END, row[0])
             tasks_listbox.itemconfig(END, bg=color)
-
+            tasks_listbox.itemconfig(END, foreground="#000000")
 
     getlistbox()
 
@@ -71,8 +71,6 @@ def show(name1):
 
         if selection:
             selected_item = event.widget.get(selection[0])
-            if selected_item == "Name":
-                return
 
             # Create a popup menu with the option to delete the selected image
             popup_menu = Menu(tasks_window, tearoff=0)
@@ -177,7 +175,6 @@ def open_task_window(task_name):
 
         for row in rows:
             if row[2] !=" ":
-                print("vklada")
                 t.insert('end', str(row[2]) + '\n\n')
             if row[3] !=" ":
                 t.insert('end', str(row[3]) + '\n\n')

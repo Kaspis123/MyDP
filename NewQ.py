@@ -22,7 +22,7 @@ def NewQ():
     customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
     # Create the main window
     window = customtkinter.CTk()
-    window_width = 350
+    window_width = 500
     window_height = 330
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
@@ -30,59 +30,70 @@ def NewQ():
     y = int((screen_height / 2) - (window_height / 2) + 60)
     window.geometry(f"{window_width}x{window_height}+{z}+{y}")
     window.title("Create Task")
-    window.resizable(False,False)
+
 
     # Create the task name label and entry field
     name_label = customtkinter.CTkLabel(window, text="Task Name:")
-    name_label.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+    name_label.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
     name_entry = customtkinter.CTkEntry(window)
-    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky=W)
+    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task description label and text field
     description_label = customtkinter.CTkLabel(window, text="Task Description:")
-    description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
+    description_label.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
     description_entry = customtkinter.CTkTextbox(window, height=80, width=140)
-    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
+    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
     creation_date_label = customtkinter.CTkLabel(window, text="Task Creation Date:")
-    creation_date_label.grid(row=2, column=0, padx=5, pady=5, sticky=W)
+    creation_date_label.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
     creation_date_entry = customtkinter.CTkEntry(window)
-    creation_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky=W)
+    creation_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
     current_date = date.today()
     formatted_date = current_date.strftime("%d/%m/%Y")
     creation_date_entry.insert(0, formatted_date)  # the index of the entry is 0, not formatted_date
 
     # Create the task due date label and date entry field
     due_date_label = customtkinter.CTkLabel(window, text="Task Due Date:")
-    due_date_label.grid(row=3, column=0, padx=5, pady=5, sticky=W)
+    due_date_label.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
     due_date_entry = DateEntry(window, date_pattern='dd/mm/yyyy')
-    due_date_entry.grid(row=3, column=1, padx=5, pady=5, sticky=W)
+    due_date_entry.grid(row=3, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task employee label and entry field
     employee_label = customtkinter.CTkLabel(window, text="Task Employee:")
-    employee_label.grid(row=4, column=0, padx=5, pady=5, sticky=W)
+    employee_label.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
     employee_entry = customtkinter.CTkEntry(window, width=85)
-    employee_entry.grid(row=4, column=1, padx=5, pady=5, sticky=W)
+    employee_entry.grid(row=4, column=1, padx=5, pady=5, sticky="nsew")
 
     pdf_label = customtkinter.CTkLabel(window, text="PDF:",)
-    pdf_label.grid(row=5,column=0, padx=5, pady=5, sticky=W)
+    pdf_label.grid(row=5,column=0, padx=5, pady=5, sticky="nsew")
     pdf_entry = customtkinter.CTkEntry(window, width=85,)
-    pdf_entry.grid(row=5, column=1, padx=5, pady=5, sticky=W)
+    pdf_entry.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
 
     button = customtkinter.CTkButton(window, text="Open PDF File", width=60,
-                                 height=30, command=lambda:open_file_dialog(pdf_entry, window))
-    button.grid(row=5, column=1, padx=(92, 0))
+                                 height=30, command=lambda: open_file_dialog(pdf_entry, window))
+    button.grid(row=5, column=2, sticky="nsew")
 
     create_employee_button = customtkinter.CTkButton(window,text="Choose",width=90,
                                  height=30,command=lambda: choose_user(employee_entry))
-    create_employee_button.grid(row=4, column=1, padx=(88, 0))
+    create_employee_button.grid(row=4, column=2, sticky="nsew")
     global x
     x = 0
     create_task_button = customtkinter.CTkButton(window, text="Create Task", width=120,
                                  height=32, command=lambda: give_to_database(name_entry.get(), description_entry.get("1.0", END), creation_date_entry.get(), due_date_entry.get(), employee_entry.get(), window,x,pdf_entry.get()))
-    create_task_button.grid(row=6, column=1, padx=(0, 88), pady=5)
+    create_task_button.grid(row=6, column=1, pady=5, sticky="nsew")
     # label = tk.Label(window)
     # label.grid(row=7, column=1, padx=5, pady=5, sticky=E)
+
+    window.rowconfigure(0, weight=1)
+    window.rowconfigure(1, weight=1)
+    window.rowconfigure(2, weight=1)
+    window.rowconfigure(3, weight=1)
+    window.rowconfigure(4, weight=1)
+    window.rowconfigure(5, weight=1)
+    window.rowconfigure(6, weight=1)
+    window.columnconfigure(0, weight=1)
+    window.columnconfigure(1, weight=1)
+
     window.mainloop()
 
 def open_file_dialog(pdf_entry,window):
@@ -97,7 +108,7 @@ def open_file_dialog(pdf_entry,window):
 
     # copy the file to the destination directory
     shutil.copy2(file_path, os.path.join(dest_dir, pdf_name))
-    customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+    customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
     customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
     windowforsmouvy =  customtkinter.CTkToplevel()
     windowforsmouvy.title("Smlouva")
@@ -113,13 +124,13 @@ def open_file_dialog(pdf_entry,window):
     check_var2 = tkinter.StringVar()
     check_var3 = tkinter.StringVar()
     check_var4 = tkinter.StringVar()
-    text_var = tkinter.StringVar(value="Prosím zaškrtněte všechny políčka, které vyplívají ze"
+    text_var = tkinter.StringVar(value="Prosím zaškrtněte všechny políčka, které vyplívají ze "
                                        "smlouvy o dílo a doplňte případné informace.")
     label = customtkinter.CTkLabel(master=windowforsmouvy,
                                    textvariable=text_var,
                                    width=120,
                                    height=25,
-                                   fg_color=("white", "gray75"),
+                                   fg_color=("#d7d6d7", "#323332"),
                                    corner_radius=8, wraplength=200, justify="center")
     label.pack(padx=20, pady=10, anchor="center")
     windowforsmouvy.lift()
@@ -227,10 +238,13 @@ def give_to_database(name_entry, description_entry, creation_date_entry, due_dat
         printa(name_entry)
         window.lift()
         if p != 0 and p != 1:
+
             window.destroy()
+
     else:
         Database_teams.add_task_for_team(employee_entry, name_entry, creation_date_entry, description_entry, due_date_entry, pdf)
         printa(name_entry)
+
         window.destroy()
 def getdatafromcheckbox1(text,window1):
     global var1
@@ -256,12 +270,14 @@ def getdatafromcheckbox4(text,window4):
 def printa(name):
     global var1, var2, var3, var4
     Database_teams.smlouvainsert(name,var1,var2,var3,var4)
+    var1 = var2 = var3 = var4 = ' '
 
 
 
 
 
-def switch_to_teams(tree):
+def switch_to_teams(tree,window):
+    window.title("Teams Database")
     global x
     x = + 1
     if x > 1:
@@ -275,7 +291,8 @@ def switch_to_teams(tree):
     for row in rows:
         task_name = row[0]
         item = tree.insert("", "end", text="", values=(task_name))
-def switch_to_users(tree):
+def switch_to_users(tree,window):
+    window.title("Users Database")
     global x
     if x != 0:
         x = 0
@@ -299,8 +316,14 @@ def choose_user(employee_entry):
     y = int((screen_height / 2) - (window_height / 2))
     new_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
     columns = ('last_name')
+    style = ttk.Style(new_window)
+    # set ttk theme to "clam" which support the fieldbackground option
+    style.theme_use("clam")
+    style.configure("Treeview", background="#323332",
+                    fieldbackground="#323332", foreground="#d7d6d7")
 
-    tree = ttk.Treeview(new_window, columns=columns, show='headings' )
+    tree = ttk.Treeview(new_window, style="Treeview", columns=columns, show='headings')
+
 
     # define headings
     tree.heading('last_name', text='Name')
@@ -311,23 +334,17 @@ def choose_user(employee_entry):
     tree.column("# 1", anchor=CENTER, stretch=YES, width=500)
     tree.grid_columnconfigure(0, weight=5)
 
-    # listbox = Listbox(new_window, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#CCEBD0",
-    #                         selectbackground="#cccccc", highlightthickness=0)
-    # listbox.grid(row = 1,column=1)
-    #
-    #
-    # listbox.delete(0, END)
-    # listbox.insert(END, "{:<30} {:^30}".format("ID", "Name"))
+
     close_button = customtkinter.CTkButton(new_window, text="Close", command=new_window.destroy)
     close_button.grid(row=5,column = 1,sticky = "w")
-    switch_button = customtkinter.CTkButton(new_window, text="Teams", command=lambda: switch_to_teams(tree))
-    switch_button.grid(row=5,column = 1, padx = (0,40))
-    switch_button_users = customtkinter.CTkButton(new_window, text="Users", command=lambda: switch_to_users(tree))
-    switch_button_users.grid(row=5,column = 1,padx =(0,30),sticky = "e")
+    switch_button = customtkinter.CTkButton(new_window, text="Teams", command=lambda: switch_to_teams(tree, new_window))
+    switch_button.grid(row=5,column = 1)
+    switch_button_users = customtkinter.CTkButton(new_window, text="Users", command=lambda: switch_to_users(tree, new_window))
+    switch_button_users.grid(row=5,column = 1,sticky = "e")
     for row in Database_teams.conn.execute('SELECT id, name FROM members'):
         task_name = row[1]
         item = tree.insert("", "end", text="", values=(task_name))
-        # listbox.insert(END, "{:<30} {:^30}".format(row[0], row[1]))
+
     tree.column("last_name", anchor="center")
 
     def double_click(event):

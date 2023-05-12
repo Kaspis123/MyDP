@@ -15,7 +15,7 @@ import customtkinter
 
 def Done():
     windowAPP = customtkinter.CTk()  # vytvořeni objektu
-    windowAPP.title("Dokončené úkoly")  # Pojmenování aplikace
+    windowAPP.title("Finished Tasks")  # Pojmenování aplikace
 
     window_width = 400
     window_height = 280
@@ -27,26 +27,16 @@ def Done():
 
 
 
-    # Create a frame to hold the listbox and scrollbar
-    # tasks_frame = customtkinter.CTkFrame(windowAPP)
-    # tasks_frame.pack()
 
-    # # Create the tasks listbox
-    # tasks_listbox = Listbox(tasks_frame, height=10, width=50, font=("Helvetica", 14), bd=2, bg="#ffffff",
-    #                         selectbackground="#cccccc", highlightthickness=0, justify="center")
-    # tasks_listbox.pack(side="left", padx=10, pady=10, fill="both", expand=True)
-    #
-    # # Create the scrollbar
-    # scrollbar = Scrollbar(tasks_frame, orient="vertical", command=tasks_listbox.yview)
-    # scrollbar.pack(side="right", fill="y")
-    #
-    # # Configure the scrollbar to control the listbox
-    # tasks_listbox.config(yscrollcommand=scrollbar.set)
-    #
-    #
-    # tasks_listbox.delete(0, END)
 
     columns = ('last_name', 'email')
+    style = ttk.Style(windowAPP)
+    # set ttk theme to "clam" which support the fieldbackground option
+    style.theme_use("clam")
+    style.configure("Treeview", background="#323332",
+                    fieldbackground="#323332", foreground="#d7d6d7")
+
+    tree = ttk.Treeview(windowAPP, style="Treeview", columns=columns, show='headings')
 
     tree = ttk.Treeview(windowAPP, columns=columns, show='headings')
 
@@ -55,7 +45,7 @@ def Done():
     tree.heading('email', text='Finished by')
 
     # pack the treeview widget
-    tree.pack()
+    tree.pack(expand=True,fill=BOTH)
 
     # Insert the current distinct script names from the database into the listbox
     for row in Finished_Tasks.conn.execute('SELECT name, employee FROM finished_tasks'):
@@ -77,8 +67,9 @@ def Done():
     tree.bind('<Double-1>', treeview_double_click)
     tree.column("email", anchor="center")
     tree.tag_configure("myfont", font=("Helvetica", 12))
-    close_button = customtkinter.CTkButton(windowAPP, text="Close", command=windowAPP.destroy)
-    close_button.pack(padx=10, pady=10)
+    close_button = customtkinter.CTkButton(windowAPP, text="Close", width= 80, command=windowAPP.destroy)
+    close_button.pack(padx=(140,140), pady=10,expand=True,fill=BOTH, anchor=CENTER)
+
     windowAPP.mainloop()
 
 def open(event):
@@ -91,73 +82,80 @@ def open(event):
     # Create the main window
     window = customtkinter.CTk()
     window.title("View Task")
+    window_width = 500
+    window_height = 350
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    z = int((screen_width / 2) - (window_width / 2) + 60)
+    y = int((screen_height / 2) - (window_height / 2) + 60)
+    window.geometry(f"{window_width}x{window_height}+{z}+{y}")
 
     # Create the task name label and entry field
     name_label = customtkinter.CTkLabel(window, text="Task Name:")
-    name_label.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+    name_label.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
     name_entry = customtkinter.CTkEntry(window)
     name_entry.insert(0, task[0])
     name_entry.configure(state="readonly")
-    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky=W)
+    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task description label and text field
     description_label = customtkinter.CTkLabel(window, text="Task Description:")
-    description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-    description_entry = customtkinter.CTkTextbox(window, height=5, width=140)
+    description_label.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+    description_entry = customtkinter.CTkTextbox(window, height=80, width=140)
     description_entry.insert(END, task[1])
     description_entry.configure(state="disabled")
-    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
+    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task creation date label and date entry field
     creation_date_label = customtkinter.CTkLabel(window, text="Task Creation Date:")
-    creation_date_label.grid(row=2, column=0, padx=5, pady=5, sticky=W)
+    creation_date_label.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
     creation_date_str = task[2]
     creation_date = datetime.strptime(creation_date_str, '%d/%m/%Y').date()
     creation_date_entry = DateEntry(window, date_pattern='dd/mm/yyyy')
     creation_date_entry.set_date(creation_date)
     creation_date_entry.configure(state="disabled")
-    creation_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky=W)
+    creation_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
     due_date_label = customtkinter.CTkLabel(window, text="Task Due Date:")
-    due_date_label.grid(row=3, column=0, padx=5, pady=5, sticky=W)
+    due_date_label.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
     due_date_str = task[3]
     due_date = datetime.strptime(due_date_str, '%d/%m/%Y').date()
     due_date_entry = DateEntry(window, date_pattern='dd/mm/yyyy')
     due_date_entry.set_date(due_date)
     due_date_entry.configure(state="disabled")
-    due_date_entry.grid(row=3, column=1, padx=5, pady=5, sticky=W)
+    due_date_entry.grid(row=3, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task employee label and entry field
     employee_label = customtkinter.CTkLabel(window, text="Task Employee:")
-    employee_label.grid(row=4, column=0, padx=5, pady=5, sticky=W)
+    employee_label.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
     employee_entry = customtkinter.CTkEntry(window)
     employee_entry.insert(0, task[4])
     employee_entry.configure(state="disabled")
-    employee_entry.grid(row=4, column=1, padx=5, pady=5, sticky=W)
+    employee_entry.grid(row=4, column=1, padx=5, pady=5, sticky="nsew")
 
     finished_date_label = customtkinter.CTkLabel(window, text="Task Finished Date:")
-    finished_date_label.grid(row=5, column=0, padx=5, pady=5, sticky=W)
+    finished_date_label.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
     finished_date_str = task[5]
     finished_date = datetime.strptime(finished_date_str, '%d/%m/%Y').date()
     finished_date_entry = DateEntry(window, date_pattern='dd/mm/yyyy')
     finished_date_entry.set_date(finished_date)
     finished_date_entry.configure(state="disabled")
-    finished_date_entry.grid(row=5, column=1, padx=5, pady=5, sticky=W)
+    finished_date_entry.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
     if task[6] != '':
         pdf_label = customtkinter.CTkLabel(window, text="PDF:")
-        pdf_label.grid(row=6, column=0, padx=5, pady=5, sticky=W)
+        pdf_label.grid(row=6, column=0, padx=5, pady=5, sticky="nsew")
         pdf_entry = customtkinter.CTkEntry(window,width=85)
         pdf_entry.insert(END, task[6])
         pdf_entry.configure(state="readonly")
-        pdf_entry.grid(row=6, column=1, padx=5, pady=5, sticky=W)
+        pdf_entry.grid(row=6, column=1, padx=5, pady=5, sticky="nsew")
 
         # Create the close button
         open_button = customtkinter.CTkButton(window, text="Open",width=60, command=lambda: show_pdf_file(pdf_entry.get()))
-        open_button.grid(row=6, column=1, padx=(88, 0))
+        open_button.grid(row=6, column=2 , sticky="nsew")
 
     # Create the close button
     close_button = customtkinter.CTkButton(window, text="Close", command=window.destroy)
-    close_button.grid(row=7, column=1, padx=(0, 88), pady=5, sticky=E)
+    close_button.grid(row=7, column=1, pady=5, sticky="nsew")
     x = Database_teams.getinfoabouattack(event)
     if x !=0:
         windowdata = customtkinter.CTkToplevel(window)
@@ -166,7 +164,15 @@ def open(event):
         text.pack()
         text.insert(INSERT, x)
 
-
+    window.rowconfigure(0, weight=1)
+    window.rowconfigure(1, weight=1)
+    window.rowconfigure(2, weight=1)
+    window.rowconfigure(3, weight=1)
+    window.rowconfigure(4, weight=1)
+    window.rowconfigure(5, weight=1)
+    window.rowconfigure(6, weight=1)
+    window.columnconfigure(0, weight=1)
+    window.columnconfigure(1, weight=1)
 
     # Make the window modal
     window.mainloop()
