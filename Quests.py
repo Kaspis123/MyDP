@@ -109,19 +109,19 @@ def open_task_window(task_name):
 
     # Create the task name label and entry field
     name_label = customtkinter.CTkLabel(window, text="Task Name:")
-    name_label.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+    name_label.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
     name_entry = customtkinter.CTkEntry(window)
     name_entry.insert(0, task[0])
     name_entry.configure(state="readonly")
-    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky=W)
+    name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task description label and text field
     description_label = customtkinter.CTkLabel(window, text="Task Description:")
-    description_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
+    description_label.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
     description_entry = customtkinter.CTkTextbox(window, height=80, width=140)
     description_entry.insert(END, task[1])
     description_entry.configure(state="disabled")
-    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky=W)
+    description_entry.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
     # # Create the task creation date label and date entry field
     # creation_date_label = Label(window, text="Task Creation Date:")
@@ -133,7 +133,7 @@ def open_task_window(task_name):
 
     # Create the task due date label and date entry field
     due_date_label = customtkinter.CTkLabel(window, text="Task Due Date:")
-    due_date_label.grid(row=2, column=0, padx=5, pady=5, sticky=W)
+    due_date_label.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
     due_date_str = task[3]
     due_date = datetime.strptime(due_date_str, '%d/%m/%Y').date()
@@ -141,11 +141,11 @@ def open_task_window(task_name):
     due_date_entry = DateEntry(window, date_pattern='dd/mm/yyyy')
     due_date_entry.set_date(due_date)
     due_date_entry.configure(state="disabled")
-    due_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky=W)
+    due_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
     days_remaining = (due_date - date.today()).days
     day_label = customtkinter.CTkLabel(window, text="Days to finish: " + str(days_remaining))
-    day_label.grid(row=3, column=1, padx=5, pady=5, sticky=W)
+    day_label.grid(row=3, column=1, padx=5, pady=5, sticky="nsew")
 
     # Create the task employee label and entry field
     # employee_label = Label(window, text="Task Employee:")
@@ -157,18 +157,18 @@ def open_task_window(task_name):
     if task[6] != '':
 
         pdf_label = customtkinter.CTkLabel(window, text="PDF:")
-        pdf_label.grid(row=4, column=0, padx=5, pady=5, sticky=W)
-        pdf_entry = customtkinter.CTkEntry(window,height=30, width=80)
+        pdf_label.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
+        pdf_entry = customtkinter.CTkEntry(window, height=30, width=80)
 
         pdf_entry.insert(END, task[6])
         pdf_entry.configure(state="readonly")
-        pdf_entry.grid(row=4, column=1, padx=5, pady=5, sticky=W)
+        pdf_entry.grid(row=4, column=1, padx=5, pady=5, sticky="nsew")
 
         # Create the close button
         open_button = customtkinter.CTkButton(window,text="Open",height=30, width=80, command=lambda: show_pdf_file(pdf_entry.get()))
-        open_button.grid(row=4, column=1, padx=(88, 0))
+        open_button.grid(row=4, column=2, sticky="nsew")
     close_button = customtkinter.CTkButton(window, text="Close", command=lambda: window.destroy())
-    close_button.grid(row=5, column=1, padx=(5, 88), pady=5, )
+    close_button.grid(row=5, column=1, pady=5, sticky="nsew")
 
     def displayrows():
         rows = Database_teams.smlouvaread(task[0])
@@ -199,6 +199,15 @@ def open_task_window(task_name):
         t.pack()
 
     displayrows()
+    window.rowconfigure(0, weight=1)
+    window.rowconfigure(1, weight=1)
+    window.rowconfigure(2, weight=1)
+    window.rowconfigure(3, weight=1)
+    window.rowconfigure(4, weight=1)
+    window.rowconfigure(5, weight=1)
+    window.rowconfigure(6, weight=1)
+    window.columnconfigure(0, weight=1)
+    window.columnconfigure(1, weight=1)
 
     window.mainloop()
 

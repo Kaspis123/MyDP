@@ -138,77 +138,90 @@ def open_file_dialog(pdf_entry,window):
     def checkbox_event():
         windowcheck=customtkinter.CTkToplevel()
         windowcheck.title("Paragraf")
-        windowcheck.resizable(False, False)
+
         windowcheck.attributes("-topmost", True)
-        window_width1 = 200
-        window_height1 = 110
+        window_width1 = 300
+        window_height1 = 300
         screen_width = windowcheck.winfo_screenwidth()
         screen_height = windowcheck.winfo_screenheight()
         x = int((screen_width / 2) - (window_width1 / 2))
         y = int((screen_height / 2) - (window_height1 / 2))
         windowcheck.geometry(f"{window_width1}x{window_height1}+{x}+{y}")
-        textbox = customtkinter.CTkTextbox(windowcheck, height=80, width=200)
-        textbox.grid(row=0, column=0)
+        textbox = customtkinter.CTkTextbox(windowcheck, height=250, width=1000)
+        textbox.grid(row=0, column=0, sticky="nsew")
 
         textbox.insert("0.0", "Je možné na zaměstnancích provádět testování takovýmto způsobem?")
-        button = customtkinter.CTkButton(windowcheck,text="Close", command=lambda: getdatafromcheckbox1(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0)
+        button = customtkinter.CTkButton(windowcheck,text="Save", command=lambda: getdatafromcheckbox1(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0,padx= (60,60),sticky="nsew")
+        windowcheck.rowconfigure(0, weight=1)
+        windowcheck.rowconfigure(1, weight=1)
+        windowcheck.columnconfigure(0, weight=1)
+        windowcheck.columnconfigure(1, weight=1)
 
         windowcheck.mainloop()
     def checkbox_event2():
         windowcheck=customtkinter.CTkToplevel()
         windowcheck.title("Paragraf")
-        windowcheck.resizable(False, False)
+
         windowcheck.attributes("-topmost", True)
-        window_width1 = 200
-        window_height1 = 110
+        window_width1 = 300
+        window_height1 = 300
         screen_width = windowcheck.winfo_screenwidth()
         screen_height = windowcheck.winfo_screenheight()
         x = int((screen_width / 2) - (window_width1 / 2))
         y = int((screen_height / 2) - (window_height1 / 2))
         windowcheck.geometry(f"{window_width1}x{window_height1}+{x}+{y}")
-        textbox = customtkinter.CTkTextbox(windowcheck, height=80, width=200)
-        textbox.grid(row=0, column=0)
+        textbox = customtkinter.CTkTextbox(windowcheck, height=250, width=1000)
+        textbox.grid(row=0, column=0, sticky="nsew")
 
         textbox.insert("0.0", "Vyplývá ze smlouvy, že je možné překonávat zabezpečení?")
-        button = customtkinter.CTkButton(windowcheck,text="Close", command=lambda: getdatafromcheckbox2(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0)
-
+        button = customtkinter.CTkButton(windowcheck,text="Save", command=lambda: getdatafromcheckbox2(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0,padx=(60,60), sticky="nsew")
+        windowcheck.rowconfigure(0, weight=1)
+        windowcheck.rowconfigure(1, weight=1)
+        windowcheck.columnconfigure(0, weight=1)
+        windowcheck.columnconfigure(1, weight=1)
         windowcheck.mainloop()
     def checkbox_event3():
         windowcheck=customtkinter.CTkToplevel()
         windowcheck.title("Paragraf")
-        windowcheck.resizable(False, False)
+
         windowcheck.attributes("-topmost", True)
-        window_width1 = 200
-        window_height1 = 110
+        window_width1 = 300
+        window_height1 = 300
         screen_width = windowcheck.winfo_screenwidth()
         screen_height = windowcheck.winfo_screenheight()
         x = int((screen_width / 2) - (window_width1 / 2))
         y = int((screen_height / 2) - (window_height1 / 2))
         windowcheck.geometry(f"{window_width1}x{window_height1}+{x}+{y}")
-        textbox = customtkinter.CTkTextbox(windowcheck, height=80, width=200)
-        textbox.grid(row=0, column=0)
+        textbox = customtkinter.CTkTextbox(windowcheck, height=250, width=1000)
+        textbox.grid(row=0, column=0, sticky="nsew")
 
         textbox.insert("0.0", "Jak bude nakládáno s hesly??")
-        button = customtkinter.CTkButton(windowcheck,text="Close", command=lambda: getdatafromcheckbox3(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0)
-
+        button = customtkinter.CTkButton(windowcheck,text="Save", command=lambda: getdatafromcheckbox3(textbox.get("1.0", END), windowcheck)).grid(row=1,column = 0,padx=(60,60), sticky="nsew")
+        windowcheck.rowconfigure(0, weight=1)
+        windowcheck.rowconfigure(1, weight=1)
+        windowcheck.columnconfigure(0, weight=1)
+        windowcheck.columnconfigure(1, weight=1)
         windowcheck.mainloop()
     def checkbox_event4():
         windowcheck = customtkinter.CTkToplevel()
         windowcheck.title("Paragraf")
-        windowcheck.resizable(False, False)
+
         windowcheck.attributes("-topmost", True)
-        window_width1 = 200
-        window_height1 = 110
+        window_width1 = 300
+        window_height1 = 300
         screen_width = windowcheck.winfo_screenwidth()
         screen_height = windowcheck.winfo_screenheight()
         x = int((screen_width / 2) - (window_width1 / 2))
         y = int((screen_height / 2) - (window_height1 / 2))
         windowcheck.geometry(f"{window_width1}x{window_height1}+{x}+{y}")
-        textbox = customtkinter.CTkTextbox(windowcheck, height=80, width=200)
-        textbox.grid(row=0, column=0)
+        textbox = customtkinter.CTkTextbox(windowcheck, height=250, width=1000)
+        textbox.grid(row=0, column=0, sticky="nsew")
         textbox.insert("0.0", "Jak budou zabezpečena získaná data?")
-        button = customtkinter.CTkButton(windowcheck, text="Close", command=lambda: getdatafromcheckbox4(textbox.get("1.0", END), windowcheck)).grid(row=1, column = 0)
-
+        button = customtkinter.CTkButton(windowcheck, text="Save", command=lambda: getdatafromcheckbox4(textbox.get("1.0", END), windowcheck)).grid(row=1, column = 0, padx=(60,60), sticky="nsew")
+        windowcheck.rowconfigure(0, weight=1)
+        windowcheck.rowconfigure(1, weight=1)
+        windowcheck.columnconfigure(0, weight=1)
+        windowcheck.columnconfigure(1, weight=1)
     checkbox = customtkinter.CTkCheckBox(master=windowforsmouvy, text="209 Podvod", command=checkbox_event,
                                          variable=check_var, onvalue="on", offvalue="off")
     checkbox.pack(padx=20, pady=10, anchor="w")
@@ -233,7 +246,12 @@ def error_user_name():
     messagebox.showerror('Error', 'Error: User does not exists!')
 
 def give_to_database(name_entry, description_entry, creation_date_entry, due_date_entry, employee_entry, window, x, pdf):
+    if name_entry == "" or employee_entry == "":
+        messagebox.showerror("Error", "Must include all fields")
+        return
+
     if x == 0:
+
         p = Database_teams.insert_task(name_entry, description_entry, creation_date_entry, due_date_entry, employee_entry, pdf)
         printa(name_entry)
         window.lift()
@@ -242,6 +260,8 @@ def give_to_database(name_entry, description_entry, creation_date_entry, due_dat
             window.destroy()
 
     else:
+
+
         Database_teams.add_task_for_team(employee_entry, name_entry, creation_date_entry, description_entry, due_date_entry, pdf)
         printa(name_entry)
 

@@ -157,7 +157,6 @@ def add_task_for_team(team_name, task_name, creation_date, task_description, tas
 
 def insert_user(name, password):
     # Check if the user already exists
-    cur.execute("SELECT * FROM members WHERE name='" + name + "' and password ='" + password + "'")
     cursor = conn.execute('SELECT id FROM members WHERE name=?', (name,))
     if cursor.fetchone() is not None:
         return 0
